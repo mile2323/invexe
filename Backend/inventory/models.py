@@ -1,6 +1,8 @@
 from mongoengine import Document, StringField, ReferenceField, FloatField, DateTimeField
 from core.models import BaseDocument
 
+import datetime
+
 class Product(BaseDocument):
     product_code = StringField(unique=True, required=True)
     name = StringField(required=True, max_length=100)
