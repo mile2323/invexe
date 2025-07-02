@@ -1,5 +1,6 @@
 import { useState } from "react";
-
+import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 const VendorForm = () => {
       const [formData, setFormData] =useState({
         companyName: '',
@@ -43,11 +44,43 @@ const VendorForm = () => {
         }
       };
 
-      const handleSubmit = (e) => {
+      const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
+        try {
+          await axios.post(`${API_URL}/purchases/supliers/`, formData,);
+          setFormData({
+            companyName: '',
+            addressLine1: '',
+        addressLine2: '',
+        city: '',
+        pinCode: '',
+        state: '',
+        country: '',
+        ownerName: '',
+        contactPerson: '',
+        officeContact: '',
+        plantContact: '',
+        residenceContact: '',
+        mobile: '',
+        email: '',
+        organizationType: '',
+        businessNature: [],
+        gstNo: '',
+        panNo: '',
+        msme: 'No',
+        enterpriseType: '',
+        bankName: '',
+        accountNo: '',
+        ifscCode: '',
+        branchCode: '',
+        branchAddress: '',
+          });
         alert('Form submitted! Check console for form data.');
-      };
+      }catch (error) {
+          console.error('Error submitting form:', error); 
+          alert('Error submitting form. Please try again.');
+      }
+    };
 
       return (
         <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
