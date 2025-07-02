@@ -3,9 +3,12 @@ import ModuleCard from './components/ModuleCard';
 import PurchasePage from './pages/PurchasePage';
 import SalesPage from './pages/SalesPage';
 import InventoryPage from './pages/InventoryPage';
+import VendorForm from './components/VendorForm';
 
 function App() {
   return (
+    <>
+    <VendorForm/>
     <Routes>
       <Route
         path="/"
@@ -73,6 +76,7 @@ function App() {
         }
       />
     </Routes>
+    </>
   );
 }
 

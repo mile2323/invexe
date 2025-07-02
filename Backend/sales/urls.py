@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import quotation_list_create, convert_quotation
+from views import suplier_list,suplier_detail
 
 urlpatterns = [
-    path('quotations/', quotation_list_create, name='quotation-list-create'),
-    path('quotations/<str:quotation_id>/convert/', convert_quotation, name='quotation-convert'),
+    path('supliers/', suplier_list, name='suplier-list'),
+    path('supliers/<str:pk>/', suplier_detail, name='suplier-detail'),
 ]
