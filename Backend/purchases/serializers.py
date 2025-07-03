@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_mongoengine.serializers import DocumentSerializer, EmbeddedDocumentSerializer
-from .models import BillingAddress, TaxInfo, BankInfo, Suplier
+from .models import BillingAddress, TaxInfo, BankInfo, Supplier
 
 class BillingAddressSerializer(EmbeddedDocumentSerializer):
     class Meta:
@@ -17,7 +17,7 @@ class BankInfoSerializer(EmbeddedDocumentSerializer):
         model = BankInfo
         fields = '__all__'
 
-class SuplierSerializer(DocumentSerializer):
+class SupplierSerializer(DocumentSerializer):
     # Define flat fields to match formData (write-only for input)
     addressLine1 = serializers.CharField(max_length=200, allow_blank=True, write_only=True)
     addressLine2 = serializers.CharField(max_length=200, allow_blank=True, write_only=True)
@@ -37,7 +37,7 @@ class SuplierSerializer(DocumentSerializer):
     email = serializers.EmailField(allow_blank=True, write_only=True)  # Ignored in model
 
     class Meta:
-        model = Suplier
+        model = Supplier
         fields = '__all__'
         extra_kwargs = {
             'billingAddress': {'read_only': True},
@@ -70,19 +70,19 @@ class SuplierSerializer(DocumentSerializer):
         }
         # validated_data.pop('email', None)  # Ignore email field
 
-        # Create Suplier instance
-        suplier = Suplier(**validated_data)
+        # Create Supplier instance
+        supplier = Supplier(**validated_data)
 
         # Add embedded documents if non-empty
         if any(billing_address_data.values()):
-            suplier.billingAddress.append(BillingAddress(**billing_address_data))
+            supplier.billingAddress.append(BillingAddress(**billing_address_data))
         if any(tax_info_data.values()):
-            suplier.taxInfo.append(TaxInfo(**tax_info_data))
+            supplier.taxInfo.append(TaxInfo(**tax_info_data))
         if any(bank_info_data.values()):
-            suplier.bankinfo.append(BankInfo(**bank_info_data))
+            supplier.bankinfo.append(BankInfo(**bank_info_data))
         print("daatta", validated_data)
-        suplier.save()
-        return suplier
+        supplier.save()
+        return supplier
 
     def update(self, instance, validated_data):
         # Extract flat fields for embedded documents

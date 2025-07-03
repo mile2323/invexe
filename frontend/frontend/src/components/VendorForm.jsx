@@ -47,7 +47,7 @@ const VendorForm = () => {
       const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-          await axios.post(`${API_URL}/purchases/supliers/`, formData,);
+          await axios.post(`${API_URL}/purchases/suppliers/`, formData,);
           setFormData({
             companyName: '',
             addressLine1: '',
