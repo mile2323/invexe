@@ -80,7 +80,7 @@ class SuplierSerializer(DocumentSerializer):
             suplier.taxInfo.append(TaxInfo(**tax_info_data))
         if any(bank_info_data.values()):
             suplier.bankinfo.append(BankInfo(**bank_info_data))
-
+        print("daatta", validated_data)
         suplier.save()
         return suplier
 

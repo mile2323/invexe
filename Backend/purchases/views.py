@@ -13,9 +13,11 @@ def suplier_list(request):
     
     elif request.method == 'POST':
         serializer = SuplierSerializer(data=request.data)
+        print("Request data:", serializer.initial_data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print("Serializer errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
