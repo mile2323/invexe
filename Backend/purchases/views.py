@@ -7,8 +7,10 @@ from .serializers import SupplierSerializer
 @api_view(['GET', 'POST'])
 def supplier_list(request):
     if request.method == 'GET':
-        Suppliers = Supplier.objects.all()
-        serializer = SupplierSerializer(Suppliers, many=True)
+        suppliers = Supplier.objects.all()
+        serializer = SupplierSerializer(suppliers, many=True)
+        # print("Raw emails:", [supplier.taxInfo for supplier in suppliers])
+        # print("Suppliers data:", serializer.data)
         return Response(serializer.data)
     
     elif request.method == 'POST':

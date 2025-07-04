@@ -68,9 +68,8 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',  # Vite default port
-]
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 
 ROOT_URLCONF = 'Backend.urls'
@@ -148,7 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 from mongoengine import connect
 
-connect(db='inventory_db', host='mongodb://localhost:27017/inventory_db')
+connect(db='cd', host='mongodb://localhost:27017/inventory_db')
 
 # REST Framework settings
 REST_FRAMEWORK = {

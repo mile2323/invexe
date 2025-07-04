@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework_mongoengine.serializers import DocumentSerializer, EmbeddedDocumentSerializer
 from .models import BillingAddress, TaxInfo, BankInfo, Supplier
+from bson import ObjectId
 
 class BillingAddressSerializer(EmbeddedDocumentSerializer):
     class Meta:
@@ -18,7 +19,9 @@ class BankInfoSerializer(EmbeddedDocumentSerializer):
         fields = '__all__'
 
 class SupplierSerializer(DocumentSerializer):
-    # Define flat fields to match formData (write-only for input)
+    # Add id field to expose ObjectId
+    id = serializers.CharField(source='_id', read_only=True)
+    # Flat fields for input
     addressLine1 = serializers.CharField(max_length=200, allow_blank=True, write_only=True)
     addressLine2 = serializers.CharField(max_length=200, allow_blank=True, write_only=True)
     city = serializers.CharField(max_length=50, allow_blank=True, write_only=True)
@@ -34,7 +37,7 @@ class SupplierSerializer(DocumentSerializer):
     ifscCode = serializers.CharField(max_length=15, allow_blank=True, write_only=True)
     branchCode = serializers.CharField(max_length=20, allow_blank=True, write_only=True)
     branchAddress = serializers.CharField(max_length=200, allow_blank=True, write_only=True)
-    email = serializers.EmailField(allow_blank=True, write_only=True)  # Ignored in model
+    email = serializers.EmailField(allow_blank=False)  # Match model required=True
 
     class Meta:
         model = Supplier
@@ -68,24 +71,23 @@ class SupplierSerializer(DocumentSerializer):
             'branchCode': validated_data.pop('branchCode', ''),
             'branchAddress': validated_data.pop('branchAddress', '')
         }
-        # validated_data.pop('email', None)  # Ignore email field
 
         # Create Supplier instance
         supplier = Supplier(**validated_data)
 
-        # Add embedded documents if non-empty
+        # Set single embedded documents
         if any(billing_address_data.values()):
-            supplier.billingAddress.append(BillingAddress(**billing_address_data))
+            supplier.billingAddress = BillingAddress(**billing_address_data)
         if any(tax_info_data.values()):
-            supplier.taxInfo.append(TaxInfo(**tax_info_data))
+            supplier.taxInfo = TaxInfo(**tax_info_data)
         if any(bank_info_data.values()):
-            supplier.bankinfo.append(BankInfo(**bank_info_data))
-        print("daatta", validated_data)
+            supplier.bankinfo = BankInfo(**bank_info_data)
+
         supplier.save()
         return supplier
 
     def update(self, instance, validated_data):
-        # Extract flat fields for embedded documents
+        # Extract flat fields
         billing_address_data = {
             'addressLine1': validated_data.pop('addressLine1', ''),
             'addressLine2': validated_data.pop('addressLine2', ''),
@@ -107,24 +109,23 @@ class SupplierSerializer(DocumentSerializer):
             'branchCode': validated_data.pop('branchCode', ''),
             'branchAddress': validated_data.pop('branchAddress', '')
         }
-        # validated_data.pop('email', None)  # Ignore email field
 
         # Update main fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
-        # Update embedded documents
-        instance.billingAddress = [BillingAddress(**billing_address_data)] if any(billing_address_data.values()) else []
-        instance.taxInfo = [TaxInfo(**tax_info_data)] if any(tax_info_data.values()) else []
-        instance.bankinfo = [BankInfo(**bank_info_data)] if any(bank_info_data.values()) else []
+        # Update single embedded documents rendition
+        instance.billingAddress = BillingAddress(**billing_address_data) if any(billing_address_data.values()) else None
+        instance.taxInfo = TaxInfo(**tax_info_data) if any(tax_info_data.values()) else None
+        instance.bankinfo = BankInfo(**bank_info_data) if any(bank_info_data.values()) else None
 
         instance.save()
         return instance
 
     def to_representation(self, instance):
-        # Get default representation
         representation = super().to_representation(instance)
-        # Initialize flat fields
+        # Ensure ObjectId is included as string
+        representation['id'] = str(instance.id)
         representation.update({
             'addressLine1': '',
             'addressLine2': '',
@@ -140,38 +141,33 @@ class SupplierSerializer(DocumentSerializer):
             'accountNo': '',
             'ifscCode': '',
             'branchCode': '',
-            'branchAddress': '',
-            'email': ''
+            'branchAddress': ''
         })
         # Flatten embedded documents
         if instance.billingAddress:
-            billing = instance.billingAddress[0]
             representation.update({
-                'addressLine1': billing.addressLine1 or '',
-                'addressLine2': billing.addressLine2 or '',
-                'city': billing.city or '',
-                'pinCode': billing.pinCode or '',
-                'state': billing.state or '',
-                'country': billing.country or ''
+                'addressLine1': instance.billingAddress.addressLine1 or '',
+                'addressLine2': instance.billingAddress.addressLine2 or '',
+                'city': instance.billingAddress.city or '',
+                'pinCode': instance.billingAddress.pinCode or '',
+                'state': instance.billingAddress.state or '',
+                'country': instance.billingAddress.country or ''
             })
         if instance.taxInfo:
-            tax = instance.taxInfo[0]
             representation.update({
-                'gstNo': tax.gstNo or '',
-                'panNo': tax.panNo or '',
-                'msme': tax.msme or '',
-                'enterpriseType': tax.enterpriseType or ''
+                'gstNo': instance.taxInfo.gstNo or '',
+                'panNo': instance.taxInfo.panNo or '',
+                'msme': instance.taxInfo.msme or '',
+                'enterpriseType': instance.taxInfo.enterpriseType or ''
             })
         if instance.bankinfo:
-            bank = instance.bankinfo[0]
             representation.update({
-                'bankName': bank.bankName or '',
-                'accountNo': bank.accountNo or '',
-                'ifscCode': bank.ifscCode or '',
-                'branchCode': bank.branchCode or '',
-                'branchAddress': bank.branchAddress or ''
+                'bankName': instance.bankinfo.bankName or '',
+                'accountNo': instance.bankinfo.accountNo or '',
+                'ifscCode': instance.bankinfo.ifscCode or '',
+                'branchCode': instance.bankinfo.branchCode or '',
+                'branchAddress': instance.bankinfo.branchAddress or ''
             })
-        # Remove nested fields from response
         representation.pop('billingAddress', None)
         representation.pop('taxInfo', None)
         representation.pop('bankinfo', None)

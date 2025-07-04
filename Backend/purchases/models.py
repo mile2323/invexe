@@ -31,7 +31,7 @@ class BankInfo(EmbeddedDocument):
 
 class Supplier(BaseDocument):
     companyName = StringField(required=True, max_length=100)
-    billingAddress=ListField(EmbeddedDocumentField(BillingAddress))
+    billingAddress=EmbeddedDocumentField(BillingAddress)
     ownerName=StringField(max_length=50)
     contactPerson=StringField(max_length=50)
     officeContact=StringField(max_length=10)
@@ -41,8 +41,8 @@ class Supplier(BaseDocument):
     email=EmailField(required=True, max_length=100)
     organizationType=StringField(max_length=100)
     businessNature=ListField()
-    taxInfo=ListField(EmbeddedDocumentField(TaxInfo))
-    bankinfo=ListField(EmbeddedDocumentField(BankInfo))
+    taxInfo=EmbeddedDocumentField(TaxInfo)
+    bankinfo=EmbeddedDocumentField(BankInfo)
 
 
     meta = {'collection': 'Supplier'}

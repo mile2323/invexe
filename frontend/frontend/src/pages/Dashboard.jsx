@@ -5,6 +5,7 @@ function Dashboard() {
 
   return (
     <div className="p-10 space-y-8">
+      
       <h1 className="text-3xl font-bold">Welcome to Your Dashboard</h1>
       <p className="text-gray-600">Choose a module to get started with managing your business</p>
 
