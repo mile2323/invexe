@@ -15,6 +15,7 @@ function App() {
       <Route path="/salespage" element={<SalesPage />} />
       <Route path="/inventory" element={<InventoryPage />} />
       <Route path="/vendor" element={<VendorForm />} />
+      <Route path="/vendor/edit/:objectId" element={<VendorForm />} />
       <Route path="/supplier" element={<Supplier />} />
     </Routes>
   );

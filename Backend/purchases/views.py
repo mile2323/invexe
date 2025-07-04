@@ -25,21 +25,21 @@ def supplier_list(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 def supplier_detail(request, pk):
     try:
-        Supplier = Supplier.objects.get(pk=pk)
+        supplier = Supplier.objects.get(pk=pk)
     except Supplier.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = SupplierSerializer(Supplier)
+        serializer = SupplierSerializer(supplier)
         return Response(serializer.data)
     
     elif request.method == 'PUT':
-        serializer = SupplierSerializer(Supplier, data=request.data)
+        serializer = SupplierSerializer(supplier, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     elif request.method == 'DELETE':
-        Supplier.delete()
+        supplier.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
