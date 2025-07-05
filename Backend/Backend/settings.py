@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'mongoengine',    
     'rest_framework',
+    'rest_framework_mongoengine',
     'corsheaders',
     'core',
     'purchases',

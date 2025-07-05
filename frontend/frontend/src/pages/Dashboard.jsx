@@ -55,7 +55,7 @@ function Dashboard() {
             <li>Inventory Reports</li>
             <li>Stock Alerts</li>
           </ul>
-          <button className="bg-orange-500 text-white px-4 py-2 rounded">
+          <button  onClick={() => navigate('/inventory')} className="bg-orange-500 text-white px-4 py-2 rounded">
             Access Inventory Module
           </button>
         </div>
