@@ -2,48 +2,50 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
+// Initial form structure
+const initialFormData = {
+  companyName: "",
+  addressLine1: "",
+  addressLine2: "",
+  city: "",
+  pinCode: "",
+  state: "",
+  country: "",
+  ownerName: "",
+  contactPerson: "",
+  officeContact: "",
+  plantContact: "",
+  residenceContact: "",
+  mobile: "",
+  email: "",
+  organizationType: "",
+  businessNature: [],
+  gstNo: "",
+  panNo: "",
+  msme: "No",
+  enterpriseType: "",
+  bankName: "",
+  accountNo: "",
+  ifscCode: "",
+  branchCode: "",
+  branchAddress: "",
+};
 
-const VendorForm = () => {
-  const { objectId } = useParams(); // Get objectId from URL
-  const navigate = useNavigate(); // For navigation after submission
-  const isEditMode = !!objectId; // Check if in edit mode
+const VendorForm = ({ submitUrl, editUrl, redirectPath = "/supplier", formTitle }) => {
+  const { objectId } = useParams(); // Optional usage
+  const navigate = useNavigate();
+  const isEditMode = !!objectId;
+  const fullEditUrl = isEditMode ? `${editUrl}${objectId}/` : editUrl;
 
-  const [formData, setFormData] = useState({
-    companyName: "",
-    addressLine1: "",
-    addressLine2: "",
-    city: "",
-    pinCode: "",
-    state: "",
-    country: "",
-    ownerName: "",
-    contactPerson: "",
-    officeContact: "",
-    plantContact: "",
-    residenceContact: "",
-    mobile: "",
-    email: "",
-    organizationType: "",
-    businessNature: [],
-    gstNo: "",
-    panNo: "",
-    msme: "No",
-    enterpriseType: "",
-    bankName: "",
-    accountNo: "",
-    ifscCode: "",
-    branchCode: "",
-    branchAddress: "",
-  });
+  const [formData, setFormData] = useState(initialFormData);
 
-  // Fetch vendor data when in edit mode
+  // Fetch vendor data for editing
   useEffect(() => {
-    if (isEditMode) {
+    if (isEditMode && editUrl) {
       const fetchVendorData = async () => {
         try {
-          const response = await axios.get(`${API_URL}/purchases/suppliers/${objectId}`);
-          setFormData(response.data); // Populate form with fetched data
+          const response = await axios.get(fullEditUrl);
+          setFormData(response.data);
         } catch (error) {
           console.error("Error fetching vendor data:", error);
           alert("Failed to load vendor data. Please try again.");
@@ -51,7 +53,7 @@ const VendorForm = () => {
       };
       fetchVendorData();
     }
-  }, [objectId]);
+  }, [editUrl, isEditMode]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -68,45 +70,19 @@ const VendorForm = () => {
   };
 
   const handleSubmit = async (e) => {
+  console.log("Form Data:", submitUrl, editUrl); // Debugging line to check form data
+
     e.preventDefault();
     try {
-      if (isEditMode) {
-        // Update existing vendor
-        await axios.put(`${API_URL}/purchases/suppliers/${objectId}/`, formData);
+      if (isEditMode && editUrl) {
+        await axios.put(fullEditUrl, formData);
         alert("Vendor updated successfully!");
       } else {
-        // Create new vendor
-        await axios.post(`${API_URL}/purchases/suppliers/`, formData);
-        setFormData({
-          companyName: "",
-          addressLine1: "",
-          addressLine2: "",
-          city: "",
-          pinCode: "",
-          state: "",
-          country: "",
-          ownerName: "",
-          contactPerson: "",
-          officeContact: "",
-          plantContact: "",
-          residenceContact: "",
-          mobile: "",
-          email: "",
-          organizationType: "",
-          businessNature: [],
-          gstNo: "",
-          panNo: "",
-          msme: "No",
-          enterpriseType: "",
-          bankName: "",
-          accountNo: "",
-          ifscCode: "",
-          branchCode: "",
-          branchAddress: "",
-        });
+        await axios.post(submitUrl, formData);
+        setFormData(initialFormData);
         alert("Vendor created successfully!");
       }
-      navigate("/supplier"); // Redirect to vendor list page
+      navigate(redirectPath);
     } catch (error) {
       console.error("Error submitting form:", error);
       alert(`Error ${isEditMode ? "updating" : "creating"} vendor. Please try again.`);
@@ -114,11 +90,13 @@ const VendorForm = () => {
   };
 
   return (
+    
     <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-        {isEditMode ? "Edit Vendor" : "Supplier/Customer/Transporter Registration Form"}
+        {formTitle || (isEditMode ? "Edit Vendor" : "Supplier/Customer/Transporter Registration Form")}
       </h1>
       <form onSubmit={handleSubmit} className="space-y-6">
+
         {/* General Information */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4 text-gray-700">General Information</h2>
@@ -130,11 +108,13 @@ const VendorForm = () => {
                 name="companyName"
                 value={formData.companyName}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 required
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
           </div>
+
+          {/* Address Info */}
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700">Billing Address *</label>
             <input
@@ -143,8 +123,8 @@ const VendorForm = () => {
               placeholder="Line 1"
               value={formData.addressLine1}
               onChange={handleChange}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               required
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
             />
             <input
               type="text"
@@ -152,7 +132,7 @@ const VendorForm = () => {
               placeholder="Line 2"
               value={formData.addressLine2}
               onChange={handleChange}
-              className="mt-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              className="mt-2 block w-full border-gray-300 rounded-md shadow-sm"
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
               <input
@@ -161,8 +141,8 @@ const VendorForm = () => {
                 placeholder="City"
                 value={formData.city}
                 onChange={handleChange}
-                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 required
+                className="block w-full border-gray-300 rounded-md shadow-sm"
               />
               <input
                 type="text"
@@ -170,8 +150,8 @@ const VendorForm = () => {
                 placeholder="Pin Code"
                 value={formData.pinCode}
                 onChange={handleChange}
-                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 required
+                className="block w-full border-gray-300 rounded-md shadow-sm"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
@@ -181,8 +161,8 @@ const VendorForm = () => {
                 placeholder="State"
                 value={formData.state}
                 onChange={handleChange}
-                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 required
+                className="block w-full border-gray-300 rounded-md shadow-sm"
               />
               <input
                 type="text"
@@ -190,88 +170,35 @@ const VendorForm = () => {
                 placeholder="Country"
                 value={formData.country}
                 onChange={handleChange}
-                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 required
+                className="block w-full border-gray-300 rounded-md shadow-sm"
               />
             </div>
           </div>
+
+          {/* Contacts */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Owner/Partner Name *</label>
-              <input
-                type="text"
-                name="ownerName"
-                value={formData.ownerName}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Contact Person Name *</label>
-              <input
-                type="text"
-                name="contactPerson"
-                value={formData.contactPerson}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                required
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Office Contact</label>
-              <input
-                type="tel"
-                name="officeContact"
-                value={formData.officeContact}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Plant/Works Contact</label>
-              <input
-                type="tel"
-                name="plantContact"
-                value={formData.plantContact}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Residence Contact</label>
-              <input
-                type="tel"
-                name="residenceContact"
-                value={formData.residenceContact}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Mobile Number *</label>
-              <input
-                type="tel"
-                name="mobile"
-                value={formData.mobile}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Email ID *</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                required
-              />
-            </div>
+            {[
+              ["ownerName", "Owner/Partner Name *"],
+              ["contactPerson", "Contact Person Name *"],
+              ["officeContact", "Office Contact"],
+              ["plantContact", "Plant/Works Contact"],
+              ["residenceContact", "Residence Contact"],
+              ["mobile", "Mobile Number *"],
+              ["email", "Email ID *"],
+            ].map(([field, label]) => (
+              <div key={field}>
+                <label className="block text-sm font-medium text-gray-700">{label}</label>
+                <input
+                  type={field.includes("email") ? "email" : "tel"}
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  required={label.includes("*")}
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                />
+              </div>
+            ))}
           </div>
         </div>
 
@@ -327,35 +254,29 @@ const VendorForm = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4 text-gray-700">Tax Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">GST No *</label>
-              <input
-                type="text"
-                name="gstNo"
-                value={formData.gstNo}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">PAN No *</label>
-              <input
-                type="text"
-                name="panNo"
-                value={formData.panNo}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                required
-              />
-            </div>
+            {[
+              ["gstNo", "GST No *"],
+              ["panNo", "PAN No *"],
+            ].map(([field, label]) => (
+              <div key={field}>
+                <label className="block text-sm font-medium text-gray-700">{label}</label>
+                <input
+                  type="text"
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                />
+              </div>
+            ))}
             <div>
               <label className="block text-sm font-medium text-gray-700">MSME</label>
               <select
                 name="msme"
                 value={formData.msme}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
               >
                 <option value="No">No</option>
                 <option value="Yes">Yes</option>
@@ -368,7 +289,7 @@ const VendorForm = () => {
                   name="enterpriseType"
                   value={formData.enterpriseType}
                   onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                 >
                   <option value="">Select Type</option>
                   <option value="Micro">Micro</option>
@@ -387,67 +308,42 @@ const VendorForm = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4 text-gray-700">Bank Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Bank Name *</label>
-              <input
-                type="text"
-                name="bankName"
-                value={formData.bankName}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Account Number *</label>
-              <input
-                type="text"
-                name="accountNo"
-                value={formData.accountNo}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">IFSC Code *</label>
-              <input
-                type="text"
-                name="ifscCode"
-                value={formData.ifscCode}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Branch Code *</label>
-              <input
-                type="text"
-                name="branchCode"
-                value={formData.branchCode}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                required
-              />
-            </div>
+            {[
+              ["bankName", "Bank Name *"],
+              ["accountNo", "Account Number *"],
+              ["ifscCode", "IFSC Code *"],
+              ["branchCode", "Branch Code *"],
+            ].map(([field, label]) => (
+              <div key={field}>
+                <label className="block text-sm font-medium text-gray-700">{label}</label>
+                <input
+                  type="text"
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                />
+              </div>
+            ))}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700">Branch Address *</label>
               <textarea
                 name="branchAddress"
                 value={formData.branchAddress}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 required
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
               />
             </div>
           </div>
         </div>
 
+        {/* Submit Button */}
         <div className="text-center">
           <button
             type="submit"
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
           >
             {isEditMode ? "Update Vendor" : "Submit"}
           </button>

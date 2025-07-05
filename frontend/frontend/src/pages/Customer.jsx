@@ -3,21 +3,21 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
 
-function Supplier() {
+function Customer() {
   const navigate = useNavigate();
-  const [suppliers, setSuppliers] = useState([]);
+  const [Customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterTerm, setFilterTerm] = useState('');
   const APIURL = import.meta.env.VITE_API_URL;
 
-  // Fetch supplier data from backend
+  // Fetch Customer data from backend
   useEffect(() => {
-    const fetchSuppliers = async () => {
+    const fetchCustomers = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${APIURL}/purchases/suppliers/`);
-        setSuppliers(response.data);
+        const response = await axios.get(`${APIURL}/sales/customers/`);
+        setCustomers(response.data);
         console.log(response.data);
         setLoading(false);
       } catch (err) {
@@ -26,7 +26,7 @@ function Supplier() {
       }
     };
 
-    fetchSuppliers();
+    fetchCustomers();
   }, []); // Empty dependency array to run once on mount
 
   // Render loading state
@@ -63,13 +63,13 @@ function Supplier() {
       
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <div className="text-sm/6 text-gray-900">
-          <h1 className="text-2xl font-bold">Supplier List</h1>
+          <h1 className="text-2xl font-bold">Customer List</h1>
           </div>
        
       </div>
       <div className="flex flex-1 justify-end">
         <button
-         onClick={() => navigate('/vendor/add-supplier')}
+         onClick={() => navigate('/vendor')}
       type="button"
       className="rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
@@ -149,13 +149,13 @@ function Supplier() {
       
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <div className="text-sm/6 text-gray-900">
-          <h1 className="text-2xl font-bold">Supplier List</h1>
+          <h1 className="text-2xl font-bold">Customer List</h1>
           </div>
        
       </div>
       <div className="flex flex-1 justify-end">
         <button
-         onClick={() =>  navigate('/vendor/add-supplier')}
+         onClick={() => navigate('/vendor/add-customer')}
       type="button"
       className="rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
@@ -224,22 +224,22 @@ function Supplier() {
   <div className="flex items-center gap-x-4">
     <input
       type="text"
-      placeholder="Search supplier..."
+      placeholder="Search Customer..."
       value={filterTerm}
       onChange={(e) => setFilterTerm(e.target.value)}
       className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
   </div>
 
-  {/* Center: Supplier List Title */}
+  {/* Center: Customer List Title */}
   <div className="absolute left-1/2 transform -translate-x-1/2">
-    <h1 className="text-2xl font-bold text-gray-900">Supplier List</h1>
+    <h1 className="text-2xl font-bold text-gray-900">Customer List</h1>
   </div>
 
   {/* Right: Add New Button */}
   <div className="ml-auto">
     <button
-      onClick={() => navigate('/vendor/add-supplier')}
+      onClick={() => navigate('/vendor/add-customer')}
       type="button"
       className="rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
@@ -280,51 +280,51 @@ function Supplier() {
             </tr>
           </thead>
           <tbody>
-            {suppliers.length === 0 ? (
+            {Customers.length === 0 ? (
               <tr>
                 <td colSpan="24" className="py-4 px-4 text-center text-gray-500">
-                  No suppliers found
+                  No Customers found
                 </td>
               </tr>
             ) : (
-              suppliers.filter(
-                (supplier) =>
-                  supplier.companyName &&
-                  supplier.companyName.toLowerCase().includes(filterTerm.toLowerCase())
-              ).map((supplier, index) => (
-                <tr key={supplier.id || index} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b"><nav className="rounded-md bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"><Link to={`/vendor/edit-supplier/${supplier.id}`} >Edit</Link></nav></td>
+              Customers.filter(
+                (Customer) =>
+                  Customer.companyName &&
+                  Customer.companyName.toLowerCase().includes(filterTerm.toLowerCase())
+              ).map((Customer, index) => (
+                <tr key={Customer.id || index} className="hover:bg-gray-50">
+                  <td className="py-2 px-4 border-b"><nav className="rounded-md bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"><Link to={`/vendor/edit-customer/${Customer.id}`} >Edit</Link></nav></td>
 
-                  <td className="py-2 px-4 border-b">{supplier.companyName || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.companyName || '-'}</td>
                   <td className="py-2 px-4 border-b">
-                    {supplier.addressLine1 || ''} {supplier.addressLine2 || ''}
+                    {Customer.addressLine1 || ''} {Customer.addressLine2 || ''}
                   </td>
-                  <td className="py-2 px-4 border-b">{supplier.city || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.pinCode || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.state || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.country || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.ownerName || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.contactPerson || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.officeContact || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.plantContact || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.residenceContact || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.mobile || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.email || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.organizationType || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.city || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.pinCode || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.state || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.country || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.ownerName || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.contactPerson || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.officeContact || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.plantContact || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.residenceContact || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.mobile || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.email || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.organizationType || '-'}</td>
                   <td className="py-2 px-4 border-b">
-                    {Array.isArray(supplier.businessNature)
-                      ? supplier.businessNature.join(', ')
+                    {Array.isArray(Customer.businessNature)
+                      ? Customer.businessNature.join(', ')
                       : '-'}
                   </td>
-                  <td className="py-2 px-4 border-b">{supplier.gstNo || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.panNo || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.msme || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.enterpriseType || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.bankName || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.accountNo || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.ifscCode || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.branchCode || '-'}</td>
-                  <td className="py-2 px-4 border-b">{supplier.branchAddress || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.gstNo || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.panNo || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.msme || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.enterpriseType || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.bankName || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.accountNo || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.ifscCode || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.branchCode || '-'}</td>
+                  <td className="py-2 px-4 border-b">{Customer.branchAddress || '-'}</td>
                 </tr>
               ))
             )}
@@ -335,4 +335,4 @@ function Supplier() {
   );
 }
 
-export default Supplier;
+export default Customer;

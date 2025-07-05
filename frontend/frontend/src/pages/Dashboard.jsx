@@ -38,7 +38,7 @@ function Dashboard() {
             <li>Invoicing</li>
             <li>Sales Reports</li>
           </ul>
-          <button  onClick={() => navigate('/salespage')}
+          <button  onClick={() => navigate('/sales')}
              className="bg-green-600 text-white px-4 py-2 rounded">
            
             Access Sales Module

@@ -3,18 +3,18 @@ import {  useEffect,useState } from 'react';
 import axios from 'axios';  
 
 
-function Purchase() {
+function Sales() {
   const navigate = useNavigate();
 
     useEffect(() => {fetchVendorData();}, []);
-    const [supplierCount, setsupplierCount] = useState(0);
+    const [CustomerCount, setCustomerCount] = useState(0);
     const API_URL = import.meta.env.VITE_API_URL;
 
       const fetchVendorData = async () => {
         try {
-          const res = await axios.get(`${API_URL}/purchases/suppliers/`);
+          const res = await axios.get(`${API_URL}/sales/customers/`);
           const count = Object.keys(res.data).length;
-          setsupplierCount(count);
+          setCustomerCount(count);
           console.log('Vendor data fetched successfully:', res.data);
         } catch (error) {
           console.error('Error fetching vendor data:', error);
@@ -24,25 +24,21 @@ function Purchase() {
   return (
     <div className="p-10 space-y-8">
       <button onClick={() => navigate('/')} className="text-blue-600">&larr; Back</button>
-      <h1 className="text-3xl font-bold">Purchase Management</h1>
-      <p className="text-gray-600">Manage suppliers, quotations, and purchase orders</p>
+      <h1 className="text-3xl font-bold">Sales Management</h1>
+      <p className="text-gray-600">Manage Customers, quotations, and Sales orders</p>
 
       
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Supplier Master */}
+        {/* Customer Master */}
         <div className="bg-white shadow-md rounded-xl p-6">
-          <h2 className="text-xl font-semibold">Supplier Master</h2>
-          <p className="text-sm text-gray-600 mb-2">Add and manage your suppliers</p>
+          <h2 className="text-xl font-semibold">Customer Master</h2>
+          <p className="text-sm text-gray-600 mb-2">Add and manage your Customers</p>
           <ul className="list-disc pl-5 text-sm text-gray-700">
             
-            <li><nav>
-              <Link to="/vendor">Add new supplier</Link>
-            </nav></li>
-            <li>Edit supplier details</li>
-            <li>View supplier list</li>
+            
           </ul>
-          <button onClick={() => navigate('/supplier')} className="mt-4 bg-gray-200 px-4 py-2 rounded">Manage Suppliers</button>
+          <button onClick={() => navigate('/Customer')} className="mt-4 bg-gray-200 px-4 py-2 rounded">Manage Customers</button>
         </div>
 
         {/* Quotation Management */}
@@ -50,19 +46,17 @@ function Purchase() {
           <h2 className="text-xl font-semibold">Quotation Management</h2>
           <p className="text-sm text-gray-600 mb-2">Create and manage quotations</p>
           <ul className="list-disc pl-5 text-sm text-gray-700">
-            <li>Create new quotations</li>
-            <li>Track quotation status</li>
-            <li>Compare quotes</li>
+          
           </ul>
-          <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Create Quotation</button>
+          <button onClick={() => navigate('/quotation')} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Create Quotation</button>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pt-6">
         <div className="bg-white shadow p-4 rounded">
-          <h4 className="text-sm text-gray-500">Total Suppliers</h4>
-          <p className="text-2xl font-bold">{supplierCount}</p>
+          <h4 className="text-sm text-gray-500">Total Customers</h4>
+          <p className="text-2xl font-bold">{CustomerCount}</p>
         </div>
         <div className="bg-white shadow p-4 rounded">
           <h4 className="text-sm text-gray-500">Active Quotations</h4>
@@ -81,4 +75,4 @@ function Purchase() {
   );
 }
 
-export default Purchase;
+export default Sales;

@@ -1,38 +1,51 @@
 from mongoengine import Document, StringField, EmailField, ReferenceField, ListField, EmbeddedDocument, EmbeddedDocumentField, FloatField
 from core.models import BaseDocument
 
+
+
+class BillingAddress(EmbeddedDocument):
+    addressLine1=StringField(max_length=200)
+    addressLine2=StringField(max_length=200)
+    city=StringField(max_length=50)
+    pinCode=StringField(max_length=50)
+    state=StringField(max_length=50)
+    country=StringField(max_length=50)
+
+
+class TaxInfo(EmbeddedDocument):
+    gstNo=StringField(max_length=15)
+    panNo=StringField(max_length=10)
+    msme=StringField(max_length=5)
+    enterpriseType=StringField(max_length=50)
+
+class BankInfo(EmbeddedDocument):
+    bankName=StringField(max_length=30)
+    accountNo=StringField(max_length=20)
+    ifscCode=StringField(max_length=15)
+    branchCode=StringField(max_length=20)
+    branchAddress=StringField(max_length=200)
+
+
+
+
+
 class Customer(BaseDocument):
-    name = StringField(required=True, max_length=100)
-    email = EmailField(unique=True)
-    phone = StringField(max_length=15)
-    address = StringField(max_length=200)
-    meta = {'collection': 'customers'}
+    companyName = StringField(required=True, max_length=100)
+    billingAddress=EmbeddedDocumentField(BillingAddress)
+    ownerName=StringField(max_length=50)
+    contactPerson=StringField(max_length=50)
+    officeContact=StringField(max_length=10)
+    plantContact=StringField(max_length=10)
+    residenceContact=StringField(max_length=10)
+    mobile=StringField(max_length=10)
+    email=EmailField(required=True, max_length=100)
+    organizationType=StringField(max_length=100)
+    businessNature=ListField()
+    taxInfo=EmbeddedDocumentField(TaxInfo)
+    bankinfo=EmbeddedDocumentField(BankInfo)
 
-class QuotationItem(EmbeddedDocument):
-    product_id = StringField(required=True)
-    quantity = FloatField(required=True)
-    unit_price = FloatField(required=True)
-    total = FloatField()
 
-class Quotation(BaseDocument):
-    quotation_number = StringField(unique=True)
-    customer = ReferenceField(Customer, required=True)
-    items = ListField(EmbeddedDocumentField(QuotationItem))
-    total_amount = FloatField()
-    status = StringField(choices=['Draft', 'Sent', 'Accepted', 'Rejected'], default='Draft')
-    meta = {'collection': 'quotations'}
+    meta = {'collection': 'Customers',}
 
-class SalesOrderItem(EmbeddedDocument):
-    product_id = StringField(required=True)
-    quantity = FloatField(required=True)
-    unit_price = FloatField(required=True)
-    total = FloatField()
 
-class SalesOrder(BaseDocument):
-    so_number = StringField(unique=True)
-    customer = ReferenceField(Customer, required=True)
-    quotation = ReferenceField(Quotation)
-    items = ListField(EmbeddedDocumentField(SalesOrderItem))
-    total_amount = FloatField()
-    status = StringField(choices=['Pending', 'Confirmed', 'Shipped', 'Delivered'], default='Pending')
-    meta = {'collection': 'sales_orders'}
+

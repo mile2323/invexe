@@ -1,7 +1,7 @@
 from django.urls import path
-from views import suplier_list,suplier_detail
+from .views import customer_detail, customer_list
 
 urlpatterns = [
-    path('supliers/', suplier_list, name='suplier-list'),
-    path('supliers/<str:pk>/', suplier_detail, name='suplier-detail'),
+    path('customers/', customer_list, name='customer-list'),
+    path('customers/<str:pk>/', customer_detail, name='customer-detail'),
 ]
