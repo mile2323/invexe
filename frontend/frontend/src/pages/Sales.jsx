@@ -59,7 +59,9 @@ function Sales() {
           <p className="text-2xl font-bold">{CustomerCount}</p>
         </div>
         <div className="bg-white shadow p-4 rounded">
-          <h4 className="text-sm text-gray-500">Active Quotations</h4>
+          <h4 className="text-sm text-gray-500">Quotations</h4>
+          <button onClick={() => navigate('/quotation-content')} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"> Quotation</button>
+
           <p className="text-2xl font-bold">0</p>
         </div>
         <div className="bg-white shadow p-4 rounded">
