@@ -1,7 +1,10 @@
 from rest_framework import serializers
 from rest_framework_mongoengine.serializers import DocumentSerializer, EmbeddedDocumentSerializer
-from .models import BillingAddress, TaxInfo, BankInfo, Customer
-from bson import ObjectId
+from .models import BillingAddress, TaxInfo, BankInfo, Customer, QuotationForSale
+from inventory.serializers import ProductSerializer
+from inventory.models import Product
+from datetime import datetime, timezone
+from bson import ObjectId   
 
 class BillingAddressSerializer(EmbeddedDocumentSerializer):
     class Meta:
@@ -171,4 +174,48 @@ class CustomerSerializer(DocumentSerializer):
         representation.pop('billingAddress', None)
         representation.pop('taxInfo', None)
         representation.pop('bankinfo', None)
+        return representation
+    
+
+
+
+
+class QuotationForSaleSerializer(serializers.Serializer):
+    customer = serializers.CharField(required=True)
+    items = ProductSerializer(many=True, required=True)
+    totalAmount = serializers.FloatField(required=True)
+
+    def validate_customer(self, value):
+        from .models import Customer
+        try:
+            Customer.objects.get(id=value)
+        except Customer.DoesNotExist:
+            raise serializers.ValidationError("Invalid customer ID.")
+        return value
+
+    def create(self, validated_data):
+        from .models import QuotationForSale
+        items_data = validated_data.pop('items')
+        quotation = QuotationForSale.objects.create(**validated_data)
+
+        # If `items` is a JSONField or list field, save the structured list directly
+        quotation.items = items_data
+        quotation.save()
+        return quotation
+
+    def to_representation(self, instance):
+        from .models import Product
+        representation = super().to_representation(instance)
+
+        enriched_items = []
+        for item in instance.items:
+            product = Product.objects.get(id=item['product'])
+            enriched_items.append({
+                'product_id': item['product'],
+                'name': product.name,
+                'quantity': item['quantity'],
+                'unit_price': item['unit_price'],
+            })
+
+        representation['items'] = enriched_items
         return representation

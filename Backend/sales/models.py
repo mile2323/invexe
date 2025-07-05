@@ -1,5 +1,7 @@
-from mongoengine import Document, StringField, EmailField, ReferenceField, ListField, EmbeddedDocument, EmbeddedDocumentField, FloatField
+from mongoengine import Document, StringField, EmailField, ReferenceField, ListField, EmbeddedDocument, EmbeddedDocumentField, FloatField, DateTimeField
 from core.models import BaseDocument
+from datetime import datetime, timezone
+from inventory.models import Product
 
 
 
@@ -43,9 +45,16 @@ class Customer(BaseDocument):
     businessNature=ListField()
     taxInfo=EmbeddedDocumentField(TaxInfo)
     bankinfo=EmbeddedDocumentField(BankInfo)
-
-
     meta = {'collection': 'Customers',}
 
 
 
+class QuotationForSale(Document):
+    customer = ReferenceField(Customer, required=True)
+    items = ListField(ReferenceField(Product), required=True)
+    quantity =FloatField(required=True)
+    totalAmount = FloatField(required=True)
+    createdAt = DateTimeField(default=datetime.now(timezone.utc))
+    updatedAt = DateTimeField(default=datetime.now(timezone.utc))
+
+    meta = {'collection': 'QuotationsForSale',}

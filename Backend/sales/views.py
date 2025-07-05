@@ -1,7 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Customer
+from .models import Customer, QuotationForSale
+from .serializers import QuotationForSaleSerializer
 from .serializers import CustomerSerializer
 
 @api_view(['GET', 'POST'])
@@ -43,3 +44,44 @@ def customer_detail(request, pk):
     elif request.method == 'DELETE':
         customer.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+
+
+@api_view(['GET', 'POST'])
+def quotation_list(request):
+    if request.method == 'GET':
+        quotations = QuotationForSale.objects.all()
+        serializer = QuotationForSaleSerializer(quotations, many=True)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        serializer = QuotationForSaleSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print("Serializer errors:", serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def quotation_detail(request, pk):
+    try:
+        quotation = QuotationForSale.objects.get(pk=pk)
+    except QuotationForSale.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = QuotationForSaleSerializer(quotation)
+        return Response(serializer.data)
+    
+    elif request.method == 'PUT':
+        serializer = QuotationForSaleSerializer(quotation, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == 'DELETE':
+        quotation.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)  
