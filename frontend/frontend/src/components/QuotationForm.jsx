@@ -7,21 +7,17 @@ const API_URL = import.meta.env.VITE_API_URL;
 const QuotationForm = () => {
   const navigate = useNavigate();
 
-  // State for form data
   const [quotationData, setQuotationData] = useState({
-    quotation_number: `QUO-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    quotationNumber: `QUO-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    customerName: "",
     customer_id: "",
-    items: [{ product_id: ""}],
-    quantity: "",
-    unit_price: "",
+    items: [{ product_id: "", quantity: "", unit_price: "",product_name:"" }],
     totalAmount: 0,
   });
 
-  // State for dropdown  
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
 
-  // Fetch customers and products for dropdowns
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -30,7 +26,6 @@ const QuotationForm = () => {
           axios.get(`${API_URL}/inventory/products`),
         ]);
         setCustomers(customerResponse.data);
-        console.log("Customers:", customerResponse.data);
         setProducts(productResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -40,7 +35,6 @@ const QuotationForm = () => {
     fetchData();
   }, []);
 
-  // Calculate total amount
   const calculateTotalAmount = () => {
     return quotationData.items.reduce((total, item) => {
       const quantity = parseFloat(item.quantity) || 0;
@@ -49,21 +43,20 @@ const QuotationForm = () => {
     }, 0);
   };
 
-  // Handle customer selection
   const handleCustomerChange = (e) => {
     setQuotationData((prev) => ({ ...prev, customer_id: e.target.value }));
   };
 
-  // Handle item changes (product, quantity)
   const handleItemChange = (index, field, value) => {
     const updatedItems = [...quotationData.items];
 
     if (field === "product_id") {
-      const selectedProduct = products.find((p) => p.product_id === value);
+      const selectedProduct = products.find((p) => p.id === value);
       updatedItems[index] = {
         ...updatedItems[index],
         product_id: value,
         unit_price: selectedProduct ? selectedProduct.unit_price : "",
+        product_name:selectedProduct.name
       };
     } else {
       updatedItems[index] = { ...updatedItems[index], [field]: value };
@@ -72,7 +65,6 @@ const QuotationForm = () => {
     setQuotationData((prev) => ({ ...prev, items: updatedItems }));
   };
 
-  // Add new item row
   const addItem = () => {
     setQuotationData((prev) => ({
       ...prev,
@@ -80,7 +72,6 @@ const QuotationForm = () => {
     }));
   };
 
-  // Remove item row
   const removeItem = (index) => {
     setQuotationData((prev) => ({
       ...prev,
@@ -88,24 +79,24 @@ const QuotationForm = () => {
     }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const submissionData = {
+      quotationNumber: `QUO-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      customerName: customers.find((c) => c.id === quotationData.customer_id)?.companyName || "",
       customer: quotationData.customer_id,
-      items: quotationData.items.map((item) => ({
-        product: item.product_id,
-        quantity: parseInt(item.quantity) || 1,
-        unit_price: parseFloat(item.unit_price) || 0,
-      })),
+      items: quotationData.items,
       totalAmount: calculateTotalAmount(),
     };
+
     console.log("Submitting quotation data:", submissionData);
+
     try {
       await axios.post(`${API_URL}/sales/quotations/`, submissionData);
       alert("Quotation created successfully!");
       setQuotationData({
-        quotation_number: `QUO-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        quotationNumber: `QUO-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
         customer_id: "",
         items: [{ product_id: "", quantity: "", unit_price: "" }],
       });
@@ -120,17 +111,14 @@ const QuotationForm = () => {
     <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Create Quotation</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Quotation Information */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4 text-gray-700">Quotation Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-             
-
- <label className="block text-sm font-medium text-gray-700">Quotation Number</label>
+              <label className="block text-sm font-medium text-gray-700">Quotation Number</label>
               <input
                 type="text"
-                value={quotationData.quotation_number}
+                value={quotationData.quotationNumber}
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
                 readOnly
               />
@@ -178,7 +166,7 @@ const QuotationForm = () => {
                 >
                   <option value="">Select Product</option>
                   {products.map((product) => (
-                    <option key={product.product_id} value={product.product_id}>
+                    <option key={product.id} value={product.id}>
                       {product.name}
                     </option>
                   ))}

@@ -1,4 +1,4 @@
-from mongoengine import Document, StringField, EmailField, ReferenceField, ListField, EmbeddedDocument, EmbeddedDocumentField, FloatField, DateTimeField
+from mongoengine import Document, StringField, EmailField, ReferenceField, ListField, EmbeddedDocument, EmbeddedDocumentField, FloatField, DateTimeField,DictField
 from core.models import BaseDocument
 from datetime import datetime, timezone
 from inventory.models import Product
@@ -50,9 +50,11 @@ class Customer(BaseDocument):
 
 
 class QuotationForSale(Document):
+    quotationNumber = StringField(required=True, max_length=50)
     customer = ReferenceField(Customer, required=True)
-    items = ListField(ReferenceField(Product), required=True)
-    quantity =FloatField(required=True)
+    customerName = StringField(max_length=100, required=True)  # Added for convenience
+    items = ListField(DictField())
+    # quantity =FloatField(required=True)
     totalAmount = FloatField(required=True)
     createdAt = DateTimeField(default=datetime.now(timezone.utc))
     updatedAt = DateTimeField(default=datetime.now(timezone.utc))

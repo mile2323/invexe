@@ -180,42 +180,48 @@ class CustomerSerializer(DocumentSerializer):
 
 
 
-class QuotationForSaleSerializer(serializers.Serializer):
-    customer = serializers.CharField(required=True)
-    items = ProductSerializer(many=True, required=True)
-    totalAmount = serializers.FloatField(required=True)
+# class QuotationForSaleSerializer(serializers.Serializer):
+#     customer = serializers.CharField(required=True)
+#     items = ProductSerializer(many=True, required=True)
+#     totalAmount = serializers.FloatField(required=True)
 
-    def validate_customer(self, value):
-        from .models import Customer
-        try:
-            Customer.objects.get(id=value)
-        except Customer.DoesNotExist:
-            raise serializers.ValidationError("Invalid customer ID.")
-        return value
+#     def validate_customer(self, value):
+#         from .models import Customer
+#         try:
+#             Customer.objects.get(id=value)
+#         except Customer.DoesNotExist:
+#             raise serializers.ValidationError("Invalid customer ID.")
+#         return value
 
-    def create(self, validated_data):
-        from .models import QuotationForSale
-        items_data = validated_data.pop('items')
-        quotation = QuotationForSale.objects.create(**validated_data)
+#     def create(self, validated_data):
+#         items_data = validated_data.pop('items')
+#         quotation = QuotationForSale.objects.create(**validated_data)
+#         print("Creating quotation with items:", items_data)
+#         print("Creating quotation with items:", quotation)
 
-        # If `items` is a JSONField or list field, save the structured list directly
-        quotation.items = items_data
-        quotation.save()
-        return quotation
+#         # If `items` is a JSONField or list field, save the structured list directly
+#         quotation.items = items_data
+#         quotation.save()
+#         return quotation
 
-    def to_representation(self, instance):
-        from .models import Product
-        representation = super().to_representation(instance)
+    # def to_representation(self, instance):
 
-        enriched_items = []
-        for item in instance.items:
-            product = Product.objects.get(id=item['product'])
-            enriched_items.append({
-                'product_id': item['product'],
-                'name': product.name,
-                'quantity': item['quantity'],
-                'unit_price': item['unit_price'],
-            })
+    #     representation = super().to_representation(instance)
+    #     print("Representation before enrichment:", instance)
+    #     enriched_items = []
+    #     for item in instance.items:
+    #         product = Product.objects.get(id=item['product'])
+    #         enriched_items.append({
+    #             'product_id': item['product'],
+    #             'name': product.name,
+    #             'quantity': item['quantity'],
+    #             'unit_price': item['unit_price'],
+    #         })
 
-        representation['items'] = enriched_items
-        return representation
+    #     representation['items'] = enriched_items
+    #     return representation
+
+class QuotationForSaleSerializer(DocumentSerializer):
+    class Meta:
+        model = QuotationForSale
+        fields = '__all__'

@@ -4,13 +4,15 @@ from rest_framework import status
 from .models import Customer, QuotationForSale
 from .serializers import QuotationForSaleSerializer
 from .serializers import CustomerSerializer
+from inventory.models import Product
+from inventory.serializers import ProductSerializer
 
 @api_view(['GET', 'POST'])
 def customer_list(request):
     if request.method == 'GET':
         customers = Customer.objects.all()
         serializer = CustomerSerializer(customers, many=True)
-        print("Customers data:", serializer.data)
+        # print("Customers data:", serializer.data)
         return Response(serializer.data)
     
     elif request.method == 'POST':
@@ -56,11 +58,13 @@ def quotation_list(request):
         return Response(serializer.data)
     
     elif request.method == 'POST':
+        print("Request data for quotation:", request.data)
+        # print("Request data for quotation:", request.data.get('items'))
         serializer = QuotationForSaleSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print("Serializer errors:", serializer.errors)
+        print("Serializer errors for quotation:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -73,6 +77,8 @@ def quotation_detail(request, pk):
 
     if request.method == 'GET':
         serializer = QuotationForSaleSerializer(quotation)
+        print("Quotation data:", serializer.data)
+        
         return Response(serializer.data)
     
     elif request.method == 'PUT':

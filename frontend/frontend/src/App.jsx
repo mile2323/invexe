@@ -10,6 +10,7 @@ import Sales from './pages/Sales';
 import Customer from './pages/Customer';
 import QuotationForm from './components/QuotationForm';
 import QuotationContent from './components/QuotationContent';
+import Quotation from './pages/Quotations';
 
 function App() {
   const APIURL = import.meta.env.VITE_API_URL;
@@ -47,8 +48,9 @@ function App() {
       <Route path="/products/add" element={<AddProduct />} />
       <Route path="/products/edit/:objectId" element={<AddProduct />} />
       <Route path="/customer" element={<Customer />} />
-      <Route path="/quotation" element={<QuotationForm />} />
-      <Route path="/quotation-content" element={<QuotationContent />} />
+      <Route path="/creat-quotation" element={<QuotationForm />} />
+      <Route path="/quotation-content/:objectId" element={<QuotationContent />} />
+      <Route path="/quotations" element={<Quotation />} />
     </Routes>
   );
 }

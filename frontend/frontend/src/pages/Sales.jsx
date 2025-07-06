@@ -48,7 +48,7 @@ function Sales() {
           <ul className="list-disc pl-5 text-sm text-gray-700">
           
           </ul>
-          <button onClick={() => navigate('/quotation')} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Create Quotation</button>
+          <button onClick={() => navigate('/quotations')} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Create Quotation</button>
         </div>
       </div>
 
