@@ -31,7 +31,7 @@ const initialFormData = {
   branchAddress: "",
 };
 
-const VendorForm = ({ submitUrl, editUrl, redirectPath = "/supplier", formTitle }) => {
+const VendorForm = ({ submitUrl, editUrl, redirectPath , formTitle }) => {
   const { objectId } = useParams(); // Optional usage
   const navigate = useNavigate();
   const isEditMode = !!objectId;
@@ -82,7 +82,7 @@ const VendorForm = ({ submitUrl, editUrl, redirectPath = "/supplier", formTitle 
         setFormData(initialFormData);
         alert("Vendor created successfully!");
       }
-      navigate(redirectPath);
+      navigate(redirectPath, { replace: true });
     } catch (error) {
       console.error("Error submitting form:", error);
       alert(`Error ${isEditMode ? "updating" : "creating"} vendor. Please try again.`);

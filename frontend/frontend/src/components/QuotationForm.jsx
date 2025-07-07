@@ -11,7 +11,9 @@ const QuotationForm = () => {
     quotationNumber: `QUO-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
     customerName: "",
     customer_id: "",
-    items: [{ product_id: "", quantity: "", unit_price: "",product_name:"" }],
+    items: [{ product_id: "", quantity: "", unit_price: "", product_name: "" }],
+    discount: 0,
+    tax: 0,
     totalAmount: 0,
   });
 
@@ -36,11 +38,18 @@ const QuotationForm = () => {
   }, []);
 
   const calculateTotalAmount = () => {
-    return quotationData.items.reduce((total, item) => {
+    const subtotal = quotationData.items.reduce((total, item) => {
       const quantity = parseFloat(item.quantity) || 0;
       const unitPrice = parseFloat(item.unit_price) || 0;
       return total + quantity * unitPrice;
     }, 0);
+    
+    const discount = parseFloat(quotationData.discount) || 0;
+    const taxRate = parseFloat(quotationData.tax) || 0;
+    const discountedAmount = subtotal - ((discount / 100) * subtotal);
+    const taxAmount = discountedAmount * (taxRate / 100);
+    
+    return discountedAmount + taxAmount;
   };
 
   const handleCustomerChange = (e) => {
@@ -55,9 +64,10 @@ const QuotationForm = () => {
       updatedItems[index] = {
         ...updatedItems[index],
         product_id: value,
-        unit_price: selectedProduct ? selectedProduct.unit_price : "",
-        product_name:selectedProduct.name
+        product_name: selectedProduct ? selectedProduct.name : "",
       };
+    } else if (field === "quantity" || field === "unit_price") {
+      updatedItems[index] = { ...updatedItems[index], [field]: parseFloat(value) || "" };
     } else {
       updatedItems[index] = { ...updatedItems[index], [field]: value };
     }
@@ -65,10 +75,14 @@ const QuotationForm = () => {
     setQuotationData((prev) => ({ ...prev, items: updatedItems }));
   };
 
+  const handleDiscountTaxChange = (field, value) => {
+    setQuotationData((prev) => ({ ...prev, [field]: value }));
+  };
+
   const addItem = () => {
     setQuotationData((prev) => ({
       ...prev,
-      items: [...prev.items, { product_id: "", quantity: "", unit_price: "" }],
+      items: [...prev.items, { product_id: "", quantity: "", unit_price: "", product_name: "" }],
     }));
   };
 
@@ -87,6 +101,8 @@ const QuotationForm = () => {
       customerName: customers.find((c) => c.id === quotationData.customer_id)?.companyName || "",
       customer: quotationData.customer_id,
       items: quotationData.items,
+      discount: parseFloat(quotationData.discount) || 0,
+      tax: parseFloat(quotationData.tax) || 0,
       totalAmount: calculateTotalAmount(),
     };
 
@@ -98,9 +114,11 @@ const QuotationForm = () => {
       setQuotationData({
         quotationNumber: `QUO-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
         customer_id: "",
-        items: [{ product_id: "", quantity: "", unit_price: "" }],
+        items: [{ product_id: "", quantity: "", unit_price: "", product_name: "" }],
+        discount: 0,
+        tax: 0,
       });
-      navigate("/sales");
+      navigate("/quotations", { replace: true });
     } catch (error) {
       console.error("Error creating quotation:", error);
       alert("Error creating quotation. Please try again.");
@@ -139,15 +157,6 @@ const QuotationForm = () => {
                 ))}
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Total Amount</label>
-              <input
-                type="text"
-                value={calculateTotalAmount().toFixed(2)}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
-                readOnly
-              />
-            </div>
           </div>
         </div>
 
@@ -178,7 +187,7 @@ const QuotationForm = () => {
                   type="number"
                   value={item.quantity}
                   onChange={(e) => handleItemChange(index, "quantity", e.target.value)}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1  block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                   required
                   min="1"
                 />
@@ -188,8 +197,10 @@ const QuotationForm = () => {
                 <input
                   type="number"
                   value={item.unit_price}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
-                  readOnly
+                  onChange={(e) => handleItemChange(index, "unit_price", e.target.value)}
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  required
+                  min="0"
                 />
               </div>
               <div className="flex items-end">
@@ -212,6 +223,41 @@ const QuotationForm = () => {
           >
             Add Item
           </button>
+
+          {/* Discount, Tax, and Total Amount */}
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Discount (%)</label>
+              <input
+                type="number"
+                value={quotationData.discount}
+                onChange={(e) => handleDiscountTaxChange("discount", e.target.value)}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                min="0"
+                step="0.01"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Tax (%)</label>
+              <input
+                type="number"
+                value={quotationData.tax}
+                onChange={(e) => handleDiscountTaxChange("tax", e.target.value)}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                min="0"
+                step="0.01"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Total Amount</label>
+              <input
+                type="text"
+                value={calculateTotalAmount().toFixed(2)}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
+                readOnly
+              />
+            </div>
+          </div>
         </div>
 
         {/* Submit Button */}

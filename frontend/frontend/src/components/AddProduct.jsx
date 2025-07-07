@@ -59,7 +59,7 @@ const AddProduct = () => {
         });
         alert("Product created successfully!");
       }
-      navigate("/Inventory"); // Redirect to product list page
+      navigate("/Inventory", { replace: true }); // Redirect to product list page
     } catch (error) {
       console.error("Error submitting form:", error);
       alert(`Error ${isEditMode ? "updating" : "creating"} product. Please try again.`);

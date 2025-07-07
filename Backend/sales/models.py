@@ -54,7 +54,8 @@ class QuotationForSale(Document):
     customer = ReferenceField(Customer, required=True)
     customerName = StringField(max_length=100, required=True)  # Added for convenience
     items = ListField(DictField())
-    # quantity =FloatField(required=True)
+    discount = FloatField(default=0.0)
+    tax = FloatField(default=0.0)
     totalAmount = FloatField(required=True)
     createdAt = DateTimeField(default=datetime.now(timezone.utc))
     updatedAt = DateTimeField(default=datetime.now(timezone.utc))

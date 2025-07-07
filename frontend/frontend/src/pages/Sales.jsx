@@ -23,7 +23,6 @@ function Sales() {
 
   return (
     <div className="p-10 space-y-8">
-      <button onClick={() => navigate('/')} className="text-blue-600">&larr; Back</button>
       <h1 className="text-3xl font-bold">Sales Management</h1>
       <p className="text-gray-600">Manage Customers, quotations, and Sales orders</p>
 
@@ -60,7 +59,6 @@ function Sales() {
         </div>
         <div className="bg-white shadow p-4 rounded">
           <h4 className="text-sm text-gray-500">Quotations</h4>
-          <button onClick={() => navigate('/quotation-content')} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"> Quotation</button>
 
           <p className="text-2xl font-bold">0</p>
         </div>

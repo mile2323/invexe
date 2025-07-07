@@ -216,6 +216,8 @@ function Quotation() {
               <th className="py-2 px-4 border-b text-left">Action</th>
               <th className="py-2 px-4 border-b text-left">Qutation No.</th>
               <th className="py-2 px-4 border-b text-left">Customer Name</th>
+              <th className="py-2 px-4 border-b text-left">Discount (%)</th>
+              <th className="py-2 px-4 border-b text-left">Tax (%)</th>
               <th className="py-2 px-4 border-b text-left">Total Amount</th>
               <th className="py-2 px-4 border-b text-left">Created At</th>
             </tr>
@@ -240,6 +242,8 @@ function Quotation() {
                   <td className="py-2 px-4 border-b">
                     {quotation.customerName || ''} 
                   </td>
+                  <td className="py-2 px-4 border-b">{quotation.discount || '-'}</td>
+                  <td className="py-2 px-4 border-b">{quotation.tax || '-'}</td>
                   <td className="py-2 px-4 border-b">{quotation.totalAmount || '-'}</td>
                   <td className="py-2 px-4 border-b">{quotation.createdAt || '-'}</td>
                   
