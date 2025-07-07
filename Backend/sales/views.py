@@ -7,6 +7,14 @@ from .serializers import CustomerSerializer
 from inventory.models import Product
 from inventory.serializers import ProductSerializer
 
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+from django.http import JsonResponse
+from django.core.mail import EmailMessage
+from weasyprint import HTML
+from datetime import datetime
+from num2words import num2words
+
 @api_view(['GET', 'POST'])
 def customer_list(request):
     if request.method == 'GET':
@@ -91,3 +99,47 @@ def quotation_detail(request, pk):
     elif request.method == 'DELETE':
         quotation.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)  
+    
+
+
+
+
+@api_view(['GET'])
+def send_quotation_email(request, quotation_id):
+    quotation = QuotationForSale.objects.get(pk=quotation_id)
+    items = quotation.items  # items is a ListField of dicts
+    print("Quotation items:", items)
+    for item in items:
+        item["total"] = float(item["quantity"]) * float(item["unit_price"])
+
+
+    subtotal = sum(item["total"] for item in items)
+    after_discount = subtotal - (subtotal * (quotation.discount or 0) / 100)
+    gst_amount = after_discount * (quotation.tax or 0) / 100
+    grand_total = after_discount + gst_amount
+
+    amount_in_words = num2words(grand_total, lang="en_IN").title() + " Only"
+
+    html_string = render_to_string("quotation_template.html", {
+        "quotation": quotation,
+        "items": items,
+        "subtotal": after_discount,
+        "gst_amount": gst_amount,
+        "grand_total": grand_total,
+        "date": datetime.now().strftime("%d/%m/%Y"),
+        "amount_in_words": amount_in_words,
+    })
+
+    html = HTML(string=html_string)
+    pdf_file = html.write_pdf()
+
+    email = EmailMessage(
+        subject=f"Quotation {quotation.quotationNumber}",
+        body="Please find attached the quotation.",
+        from_email="mile2323@gmail.com",
+        to=["mk8884484@gmail.com"],  # or use quotation.customer.email if you prefer
+    )
+    email.attach(f"Quotation_{quotation.quotationNumber}.pdf", pdf_file, "application/pdf")
+    email.send()
+
+    return JsonResponse({"status": "email sent"})

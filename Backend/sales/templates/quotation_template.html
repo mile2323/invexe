@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f7fafc;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 100%;
+      margin: 0 auto;
+    }
+    .card-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #1a202c;
+      margin: 0;
+    }
+    .card-content {
+      padding: 24px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+      font-size: 0.875rem;
+    }
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+    }
+    th {
+      background: #edf2f7;
+      color: #718096;
+      font-weight: 600;
+    }
+    .right {
+      text-align: right;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .small {
+      font-size: 0.75rem;
+      color: #718096;
+    }
+    .text-sm {
+      font-size: 0.875rem;
+      color: #4a5568;
+    }
+    .text-muted-foreground {
+      color: #718096;
+    }
+    .font-semibold {
+      font-weight: 600;
+    }
+    .font-bold {
+      font-weight: 700;
+    }
+    .text-blue-800 {
+      color: #2b6cb0;
+    }
+    .text-green-800 {
+      color: #2f855a;
+    }
+    .italic {
+      font-style: italic;
+    }
+    .space-y-1 > :not(:last-child) {
+      margin-bottom: 4px;
+    }
+    .space-y-4 > :not(:last-child) {
+      margin-bottom: 16px;
+    }
+    .mt-4 {
+      margin-top: 16px;
+    }
+    .mt-6 {
+      margin-top: 24px;
+    }
+    .mb-2 {
+      margin-bottom: 8px;
+    }
+    .ml-5 {
+      margin-left: 20px;
+    }
+    .list-disc {
+      list-style-type: disc;
+    }
+    .flex {
+      display: flex;
+    }
+    .justify-between {
+      justify-content: space-between;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .overflow-x-auto {
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <!-- <div class="card-header">
+      <h2 class="card-title">Quotation No: </h2>
+      <h1 class="card-title ">{{ quotation.quotationNumber }}</h1>
+      <p class="text-sm text-muted-foreground">Date: {{ date }}</p>
+    </div> -->
+    <div class="card-header flex justify-between items-center">
+  <div>
+    <h2 class="card-title">Quotation No: </h2>
+      <h3 class="card-title ">{{ quotation.quotationNumber }}</h3>
+    <p class="text-sm text-muted-foreground">Date: {{ date }}</p>
+  </div>
+  <div class="text-right">
+    <h1  style="border-bottom: 2px solid #000; display: inline-block;">Milestone </h1>
+  </div>
+</div>
+    <div class="card-content space-y-4 text-sm">
+      <div class="flex justify-between">
+        <div>
+          <p><strong>Party Name:</strong> {{ quotation.customerName|default:"N/A" }}</p>
+        </div>
+        <div class="text-right">
+          <p><strong>Company:</strong> Milestone Soft Tech Pvt Ltd</p>
+          <p>69/2, Vikas Nagar, Devpuri, Raipur CG</p>
+          <p>Ph: 0771-4020500, 7587777550/51/52</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Rate</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ item.product_name }}</td>
+              <td class="right">{{ item.quantity }}</td>
+              <td class="right">{{ item.unit_price }}</td>
+              <td class="right">{{ item.total}}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted-foreground">No quotation items found</td>
+            </tr>
+            {% endfor %}
+            <tr class="font-semibold">
+              <td colspan="4" class="right">Discount (%)</td>
+              <td class="right">{{ quotation.discount|default:0 }}</td>
+            </tr>
+            <tr class="font-semibold">
+              <td colspan="4" class="right">Subtotal</td>
+              <td class="right">{{ subtotal|floatformat:2 }}</td>
+            </tr>
+            <tr class="font-semibold text-blue-800">
+              <td colspan="4" class="right">GST ({{ quotation.tax|default:0 }}%)</td>
+              <td class="right">{{ gst_amount|floatformat:2 }}</td>
+            </tr>
+            <tr class="font-bold text-green-800">
+              <td colspan="4" class="right">Grand Total</td>
+              <td class="right">{{ grand_total|floatformat:2 }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="mt-4 italic text-sm">
+        <strong>Amount in Words:</strong> {{ amount_in_words }}
+      </p>
+
+      <div>
+        <h4 class="font-semibold mt-6 mb-2">Bank Account Details</h4>
+        <ul class="list-disc ml-5">
+          <li>Bank: BANK OF BARODA, PACHPEDI NAKA, RAIPUR</li>
+          <li>A/c No: 86950500000005</li>
+          <li>IFSC Code: BARB0DBPUCH</li>
+          <li>In favor of: Milestone Soft Tech Pvt Ltd</li>
+        </ul>
+      </div>
+
+      <div class="mt-4 text-xs space-y-1 text-muted-foreground">
+        <p><strong>Note:</strong> Amount negotiable based on work scope.</p>
+        <p>We declare this reflects actual service pricing.</p>
+        <p>Subject to Raipur Jurisdiction.</p>
+        <p><strong>PAN:</strong> AAGCM4183P | <strong>GST:</strong> 22AAGCM4183P2Z2</p>
+      </div>
+
+      <div class="text-right font-semibold mt-6">
+        <p>For Milestone Soft Tech Pvt. Ltd.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

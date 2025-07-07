@@ -4,72 +4,120 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Printer } from "lucide-react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { useReactToPrint } from "react-to-print";
 
 const QuotationContent = () => {
   const componentRef = useRef(null);
   const APIURL = import.meta.env.VITE_API_URL;
-  const [quotations, setQuotations] = useState({});
+  const [quotation, setQuotation] = useState({});
   const [items, setItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const { objectId } = useParams();
 
-  const handlePrint = useReactToPrint({
-    content: () => {
-      if (!componentRef.current) {
-        console.error("No content to print: componentRef is null");
-        return null;
-      }
-      return componentRef.current;
-    },
-    documentTitle: "Security Quotation",
-  });
+  const handleEmail = async () => {
+  try {
+    const response = await axios.get(`${APIURL}/sales/send-quotation-email/${quotation.id}/`);
+    alert("Email sent successfully!");
+  } catch (error) {
+    alert("Failed to send email.");
+  }
+};
+
+  const handlePrint = () => {
+    if (componentRef.current) {
+      document.title = "Security Quotation";
+      window.print();
+      document.title = "Quotation App"; // Reset title after printing
+    } else {
+      alert("Quotation not ready to print yet.");
+    }
+  };
 
   useEffect(() => {
-    const fetchQuotationData = async () => {
+    const fetchData = async () => {
       try {
         const response = await axios.get(`${APIURL}/sales/quotations/${objectId}/`);
-        setQuotations(response.data);
-        console.log(response.data);
-      } catch (err) {
+        setQuotation(response.data);
+      } catch (error) {
+        console.error("Failed to fetch quotation data:", error);
         alert("Failed to load quotation data. Please try again.");
-        console.error("Error fetching quotation data:", err);
       }
     };
-    fetchQuotationData();
+    fetchData();
   }, [objectId, APIURL]);
 
   useEffect(() => {
-    setItems(quotations.items || []);
-    const total = quotations.items?.reduce((acc, item) => {
-      return acc + item.quantity * item.unit_price;
-    }, 0) || 0;
-    setTotalAmount(total - (total * (quotations.discount || 0) / 100));
-  }, [quotations]);
+    setItems(quotation.items || []);
+    const subtotal =
+      quotation.items?.reduce((acc, item) => acc + item.quantity * item.unit_price, 0) || 0;
+    const afterDiscount = subtotal - (subtotal * (quotation.discount || 0)) / 100;
+    setTotalAmount(afterDiscount);
+  }, [quotation]);
+
+  const today = new Date().toLocaleDateString("en-IN");
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <div className="flex justify-between mb-4">
+      <style>
+        {`
+          @media print {
+            body * {
+              visibility: hidden;
+            }
+            .printable-area, .printable-area * {
+              visibility: visible;
+            }
+            .printable-area {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              background: white;
+              padding: 20px;
+            }
+            .no-print {
+              display: none;
+            }
+          }
+        `}
+      </style>
+      <div className="flex justify-between mb-4 no-print">
         <h2 className="text-2xl font-bold">Security Quotation</h2>
-        <Button onClick={handlePrint} variant="outline" disabled={!quotations.quotationNumber}>
+        <Button
+          onClick={handlePrint}
+          variant="outline"
+          disabled={!quotation.quotationNumber}
+        >
           <Printer className="w-4 h-4 mr-2" />
           Print / Download
         </Button>
+        <Button
+      onClick={handleEmail}
+      variant="secondary"
+      disabled={!quotation.quotationNumber}
+    >
+      Send Email
+    </Button>
       </div>
 
-      <div ref={componentRef}>
+      <div ref={componentRef} className="printable-area">
         <Card>
           <CardHeader>
-            <CardTitle>Quotation No: {quotations.quotationNumber || "N/A"}/1</CardTitle>
-            <p className="text-sm text-muted-foreground">Date: 24/06/2025</p>
+            <CardTitle>
+              Quotation No: {quotation.quotationNumber || "N/A"}/1
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">Date: {today}</p>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="flex justify-between">
               <div>
-                <p><strong>Party Name:</strong> {quotations.customerName || "N/A"}</p>
+                <p>
+                  <strong>Party Name:</strong> {quotation.customerName || "N/A"}
+                </p>
               </div>
               <div className="text-right">
-                <p><strong>Company:</strong> Milestone Soft Tech Pvt Ltd</p>
+                <p>
+                  <strong>Company:</strong> Milestone Soft Tech Pvt Ltd
+                </p>
                 <p>69/2, Vikas Nagar, Devpuri, Raipur CG</p>
                 <p>Ph: 0771-4020500, 7587777550/51/52</p>
               </div>
@@ -90,35 +138,47 @@ const QuotationContent = () => {
                   {items.length === 0 ? (
                     <tr>
                       <td colSpan="5" className="py-4 px-4 text-center text-gray-500">
-                        No quotation found
+                        No quotation items found
                       </td>
                     </tr>
                   ) : (
-                    items.map((i, index) => (
+                    items.map((item, index) => (
                       <tr key={index}>
                         <td className="border px-3 py-2">{index + 1}</td>
-                        <td className="border px-3 py-2">{i.product_name}</td>
-                        <td className="border px-3 py-2">{i.quantity}</td>
-                        <td className="border px-3 py-2">{i.unit_price}</td>
-                        <td className="border px-3 py-2">{parseInt(i.quantity * i.unit_price)}</td>
+                        <td className="border px-3 py-2">{item.product_name}</td>
+                        <td className="border px-3 py-2">{item.quantity}</td>
+                        <td className="border px-3 py-2">{item.unit_price}</td>
+                        <td className="border px-3 py-2">{item.quantity * item.unit_price}</td>
                       </tr>
                     ))
                   )}
                   <tr className="font-semibold">
-                    <td colSpan="4" className="border px-3 py-2 text-right">Discount (%)</td>
-                    <td className="border px-3 py-2">{quotations.discount || 0}</td>
+                    <td colSpan="4" className="border px-3 py-2 text-right">
+                      Discount (%)
+                    </td>
+                    <td className="border px-3 py-2">{quotation.discount || 0}</td>
                   </tr>
                   <tr className="font-semibold">
-                    <td colSpan="4" className="border px-3 py-2 text-right">Subtotal</td>
-                    <td className="border px-3 py-2">{totalAmount}</td>
+                    <td colSpan="4" className="border px-3 py-2 text-right">
+                      Subtotal
+                    </td>
+                    <td className="border px-3 py-2">{totalAmount.toFixed(2)}</td>
                   </tr>
                   <tr className="font-semibold text-blue-800">
-                    <td colSpan="4" className="border px-3 py-2 text-right">GST ({quotations.tax || 0}%)</td>
-                    <td className="border px-3 py-2">{(totalAmount * (quotations.tax || 0) / 100)}</td>
+                    <td colSpan="4" className="border px-3 py-2 text-right">
+                      GST ({quotation.tax || 0}%)
+                    </td>
+                    <td className="border px-3 py-2">
+                      {(totalAmount * (quotation.tax || 0) / 100).toFixed(2)}
+                    </td>
                   </tr>
                   <tr className="font-bold text-green-800">
-                    <td colSpan="4" className="border px-3 py-2 text-right">Grand Total</td>
-                    <td className="border px-3 py-2">{totalAmount + (totalAmount * (quotations.tax || 0) / 100)}</td>
+                    <td colSpan="4" className="border px-3 py-2 text-right">
+                      Grand Total
+                    </td>
+                    <td className="border px-3 py-2">
+                      {(totalAmount + (totalAmount * (quotation.tax || 0) / 100)).toFixed(2)}
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -139,10 +199,14 @@ const QuotationContent = () => {
             </div>
 
             <div className="mt-4 text-xs space-y-1 text-muted-foreground">
-              <p><strong>Note:</strong> Amount negotiable based on work scope.</p>
+              <p>
+                <strong>Note:</strong> Amount negotiable based on work scope.
+              </p>
               <p>We declare this reflects actual service pricing.</p>
               <p>Subject to Raipur Jurisdiction.</p>
-              <p><strong>PAN:</strong> AAGCM4183P | <strong>GST:</strong> 22AAGCM4183P2Z2</p>
+              <p>
+                <strong>PAN:</strong> AAGCM4183P | <strong>GST:</strong> 22AAGCM4183P2Z2
+              </p>
             </div>
 
             <div className="text-right font-semibold mt-6">

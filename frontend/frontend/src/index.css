@@ -1,4 +1,14 @@
 @import "tailwindcss";
+
+/* fix html2canvas color issues */
+html {
+  color-scheme: light;
+}
+* {
+  --tw-ring-color: rgb(59 130 246 / var(--tw-ring-opacity, 0.5));
+  --tw-shadow-color: rgb(0 0 0 / 0.1);
+}
+
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
