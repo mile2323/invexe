@@ -14,6 +14,7 @@ from django.core.mail import EmailMessage
 from weasyprint import HTML
 from datetime import datetime
 from num2words import num2words
+from django.contrib.staticfiles import finders
 
 @api_view(['GET', 'POST'])
 def customer_list(request):
@@ -104,14 +105,26 @@ def quotation_detail(request, pk):
 
 
 
+import base64
+from django.conf import settings
+import os
+
 @api_view(['GET'])
 def send_quotation_email(request, quotation_id):
-    quotation = QuotationForSale.objects.get(pk=quotation_id)
-    items = quotation.items  # items is a ListField of dicts
-    print("Quotation items:", items)
+    try:
+        quotation = QuotationForSale.objects.get(pk=quotation_id)
+    except QuotationForSale.DoesNotExist:
+        return Response({"error": "Quotation not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        customer = Customer.objects.get(pk=quotation.customer.id)
+    except Customer.DoesNotExist:
+        return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+
+    items = quotation.items
     for item in items:
         item["total"] = float(item["quantity"]) * float(item["unit_price"])
-
 
     subtotal = sum(item["total"] for item in items)
     after_discount = subtotal - (subtotal * (quotation.discount or 0) / 100)
@@ -119,6 +132,14 @@ def send_quotation_email(request, quotation_id):
     grand_total = after_discount + gst_amount
 
     amount_in_words = num2words(grand_total, lang="en_IN").title() + " Only"
+
+    # Embed logo image as base64
+    logo_path = finders.find('images/company_logo.png')  # Only pass relative path inside 'static'
+
+    if not logo_path:
+        return Response({"error": "Logo image not found"}, status=500)
+    with open(logo_path, 'rb') as image_file:
+        logo_base64 = base64.b64encode(image_file.read()).decode('utf-8')
 
     html_string = render_to_string("quotation_template.html", {
         "quotation": quotation,
@@ -128,6 +149,7 @@ def send_quotation_email(request, quotation_id):
         "grand_total": grand_total,
         "date": datetime.now().strftime("%d/%m/%Y"),
         "amount_in_words": amount_in_words,
+        "logo_base64": logo_base64,
     })
 
     html = HTML(string=html_string)
@@ -137,9 +159,40 @@ def send_quotation_email(request, quotation_id):
         subject=f"Quotation {quotation.quotationNumber}",
         body="Please find attached the quotation.",
         from_email="mile2323@gmail.com",
-        to=["mk8884484@gmail.com"],  # or use quotation.customer.email if you prefer
+        to=[quotation.customer.email]  # Assuming customer has an email field,
     )
     email.attach(f"Quotation_{quotation.quotationNumber}.pdf", pdf_file, "application/pdf")
     email.send()
 
     return JsonResponse({"status": "email sent"})
+
+
+from django.shortcuts import render, get_object_or_404
+from django.utils.timezone import now
+from num2words import num2words
+from .models import QuotationForSale  # Adjust import as needed
+
+def preview_quotation_template(request, quotation_id):
+    quotation = QuotationForSale.objects.get(pk=quotation_id)
+    items = quotation.items  # assuming items is a list of dicts
+
+    # Calculate totals
+    for item in items:
+        item["total"] = float(item["quantity"]) * float(item["unit_price"])
+
+    subtotal = sum(item["total"] for item in items)
+    after_discount = subtotal - (subtotal * (quotation.discount or 0) / 100)
+    gst_amount = after_discount * (quotation.tax or 0) / 100
+    grand_total = after_discount + gst_amount
+
+    amount_in_words = num2words(grand_total, lang="en_IN").title() + " Only"
+
+    return render(request, "quotation_template.html", {
+        "quotation": quotation,
+        "items": items,
+        "subtotal": after_discount,
+        "gst_amount": gst_amount,
+        "grand_total": grand_total,
+        "date": now().strftime("%d/%m/%Y"),
+        "amount_in_words": amount_in_words,
+    })

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -121,15 +122,17 @@
       <p class="text-sm text-muted-foreground">Date: {{ date }}</p>
     </div> -->
     <div class="card-header flex justify-between items-center">
-  <div>
-    <h2 class="card-title">Quotation No: </h2>
-      <h3 class="card-title ">{{ quotation.quotationNumber }}</h3>
-    <p class="text-sm text-muted-foreground">Date: {{ date }}</p>
-  </div>
-  <div class="text-right">
-    <h1  style="border-bottom: 2px solid #000; display: inline-block;">Milestone </h1>
-  </div>
-</div>
+      <div>
+        <h2 class="card-title">Quotation No: </h2>
+        <p class="text-sm text-muted-foreground">{{ quotation.quotationNumber }}</p>
+        <p class="text-sm text-muted-foreground">Date: {{ date }}</p>
+      </div>
+      <div style="display: flex; align-items: center;">
+        <img src="data:image/png;base64,{{ logo_base64 }}" alt="Company Logo" style="height: 60px; margin-right: 10px;" />
+    
+        <h1 style="border-bottom: 2px solid #000; display: inline-block;font-size: 40px; ">Milestone</h1>
+      </div>
+    </div>
     <div class="card-content space-y-4 text-sm">
       <div class="flex justify-between">
         <div>
@@ -209,7 +212,7 @@
       </div>
 
       <div class="text-right font-semibold mt-6">
-        <p>For Milestone Soft Tech Pvt. Ltd.</p>
+        <!-- <p>For Milestone Soft Tech Pvt. Ltd.</p> -->
       </div>
     </div>
   </div>
