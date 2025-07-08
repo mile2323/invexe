@@ -194,7 +194,7 @@ const VendorForm = ({ submitUrl, editUrl, redirectPath , formTitle }) => {
                   name={field}
                   value={formData[field]}
                   onChange={handleChange}
-                  required={label.includes("*")}
+                 
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                 />
               </div>
@@ -265,7 +265,7 @@ const VendorForm = ({ submitUrl, editUrl, redirectPath , formTitle }) => {
                   name={field}
                   value={formData[field]}
                   onChange={handleChange}
-                  required
+                  
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                 />
               </div>
@@ -321,7 +321,7 @@ const VendorForm = ({ submitUrl, editUrl, redirectPath , formTitle }) => {
                   name={field}
                   value={formData[field]}
                   onChange={handleChange}
-                  required
+                  
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                 />
               </div>
@@ -332,7 +332,7 @@ const VendorForm = ({ submitUrl, editUrl, redirectPath , formTitle }) => {
                 name="branchAddress"
                 value={formData.branchAddress}
                 onChange={handleChange}
-                required
+               
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
               />
             </div>

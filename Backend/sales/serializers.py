@@ -41,6 +41,9 @@ class CustomerSerializer(DocumentSerializer):
     branchCode = serializers.CharField(max_length=20, allow_blank=True, write_only=True)
     branchAddress = serializers.CharField(max_length=200, allow_blank=True, write_only=True)
     email = serializers.EmailField(allow_blank=False)  # Match model required=True
+    officeContact = serializers.CharField(allow_blank=True, required=False)
+    plantContact = serializers.CharField(allow_blank=True, required=False)
+    residenceContact = serializers.CharField(allow_blank=True, required=False)
 
     class Meta:
         model = Customer

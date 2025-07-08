@@ -8,10 +8,10 @@ const QuotationForm = () => {
   const navigate = useNavigate();
 
   const [quotationData, setQuotationData] = useState({
-    quotationNumber: `QUO-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    quotationNumber: `QUT/Mile/` ,
     customerName: "",
     customer_id: "",
-    items: [{ product_id: "", quantity: "", unit_price: "", product_name: "" }],
+    items: [{ product_id: "", quantity: "", unit_price: "", product_name: "" ,amount:""}],
     discount: 0,
     tax: 0,
     totalAmount: 0,
@@ -19,16 +19,19 @@ const QuotationForm = () => {
 
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
+  const [quotation, setQuotation] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [customerResponse, productResponse] = await Promise.all([
+        const [customerResponse, productResponse, quotationRes] = await Promise.all([
           axios.get(`${API_URL}/sales/customers`),
           axios.get(`${API_URL}/inventory/products`),
+          axios.get(`${API_URL}/sales/quotations/`),
         ]);
         setCustomers(customerResponse.data);
         setProducts(productResponse.data);
+        setQuotation(quotationRes.data);
       } catch (error) {
         console.error("Error fetching data:", error);
         alert("Failed to load customers or products. Please try again.");
@@ -36,6 +39,15 @@ const QuotationForm = () => {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (quotation) {
+      setQuotationData((prev) => ({
+        ...prev,
+        quotationNumber: `QUT/Mile/` + (500 + quotation.length) || `QUT/Mile/`,
+      }));
+    }
+  }, [quotation]);
 
   const calculateTotalAmount = () => {
     const subtotal = quotationData.items.reduce((total, item) => {
@@ -97,7 +109,7 @@ const QuotationForm = () => {
     e.preventDefault();
 
     const submissionData = {
-      quotationNumber: `QUO-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      quotationNumber: `QUT/Mile/` + (500 + quotation.length) || `QUT/Mile/`,
       customerName: customers.find((c) => c.id === quotationData.customer_id)?.companyName || "",
       customer: quotationData.customer_id,
       items: quotationData.items,

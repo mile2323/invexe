@@ -86,9 +86,17 @@ def quotation_detail(request, pk):
 
     if request.method == 'GET':
         serializer = QuotationForSaleSerializer(quotation)
-        print("Quotation data:", serializer.data)
-        
-        return Response(serializer.data)
+        data= serializer.data
+        contact = ""
+        contact=contact + quotation.customer.officeContact if quotation.customer and quotation.customer.officeContact else ""
+        contact=contact + ", " + quotation.customer.plantContact if quotation.customer and quotation.customer.plantContact else contact
+        contact=contact + ", " + quotation.customer.residenceContact if quotation.customer and quotation.customer.residenceContact else contact
+        contact=contact + ", " + quotation.customer.mobile if quotation.customer and quotation.customer.mobile else contact
+        data['contact'] = contact
+
+        data['address']= quotation.customer.billingAddress.addressLine1 if quotation.customer and quotation.customer.billingAddress else ""
+        print("Quotation data:", data)
+        return Response(data)
     
     elif request.method == 'PUT':
         serializer = QuotationForSaleSerializer(quotation, data=request.data)
@@ -120,8 +128,17 @@ def send_quotation_email(request, quotation_id):
         customer = Customer.objects.get(pk=quotation.customer.id)
     except Customer.DoesNotExist:
         return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
-    
 
+    contact = ""
+    contact=contact + customer.officeContact if customer and customer.officeContact else ""
+    contact=contact + ", " + customer.plantContact if customer and customer.plantContact else contact
+    contact=contact + ", " + customer.residenceContact if customer and customer.residenceContact else contact
+    contact=contact + ", " + customer.mobile if customer and customer.mobile else contact
+    # quotation['contact'] = contact
+    # quotation['address']= customer.billingAddress.addressLine1 if customer and customer.billingAddress else ""
+    
+    print(contact)
+        
     items = quotation.items
     for item in items:
         item["total"] = float(item["quantity"]) * float(item["unit_price"])
@@ -150,6 +167,9 @@ def send_quotation_email(request, quotation_id):
         "date": datetime.now().strftime("%d/%m/%Y"),
         "amount_in_words": amount_in_words,
         "logo_base64": logo_base64,
+        "contact": contact,
+        "address": customer.billingAddress.addressLine1 if customer and customer.billingAddress else "",
+    
     })
 
     html = HTML(string=html_string)
@@ -159,7 +179,7 @@ def send_quotation_email(request, quotation_id):
         subject=f"Quotation {quotation.quotationNumber}",
         body="Please find attached the quotation.",
         from_email="mile2323@gmail.com",
-        to=[quotation.customer.email]  # Assuming customer has an email field,
+        to=[quotation.customer.email]  # Assuming customer has an email field
     )
     email.attach(f"Quotation_{quotation.quotationNumber}.pdf", pdf_file, "application/pdf")
     email.send()

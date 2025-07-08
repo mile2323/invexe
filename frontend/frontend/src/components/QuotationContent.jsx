@@ -143,7 +143,7 @@ const QuotationContent = () => {
             <div className="flex justify-between items-center">
             <div className="text-right">
               <CardTitle>
-                Quotation No: {quotation.quotationNumber || "N/A"}/1
+               {quotation.quotationNumber || "N/A"}/1
               </CardTitle>
               <p className="text-sm text-muted-foreground">Date: {today}</p>
             </div><div className="flex items-center space-x-4">
@@ -161,6 +161,12 @@ const QuotationContent = () => {
               <div>
                 <p>
                   <strong>Party Name:</strong> {quotation.customerName || "N/A"}
+                </p>
+                <p>
+                  <strong>Address:</strong> {quotation.address || "N/A"}
+                </p>
+                <p>
+                  <strong>Contact:</strong> {quotation.contact || "N/A"}
                 </p>
               </div>
               <div className="text-right">
