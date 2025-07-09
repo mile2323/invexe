@@ -178,26 +178,28 @@ const QuotationContent = () => {
             </div>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
-            <div className="flex justify-between">
-              <div>
-                <p>
-                  <strong>Party Name:</strong> {quotation.customerName || "N/A"}
-                </p>
-                <p>
-                  <strong>Address:</strong> {quotation.address || "N/A"}
-                </p>
-                <p>
-                  <strong>Contact:</strong> {quotation.contact || "N/A"}
-                </p>
-              </div>
-              <div className="text-right">
-                <p>
-                  <strong>Company:</strong> Milestone Soft Tech Pvt Ltd
-                </p>
-                <p>69/2, Vikas Nagar, Devpuri, Raipur CG</p>
-                <p>Ph: 0771-4020500, 7587777550/51/52</p>
-              </div>
-            </div>
+            <table style={{ width: "100%", marginBottom: "1rem", fontSize: "0.9rem" }}>
+  <thead>
+    <tr>
+      <th style={{ textAlign: "left" }}>From (Company)</th>
+      <th style={{ textAlign: "right" }}>To (Party)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style={{ width: "50%", verticalAlign: "top", textAlign: "left" }}>
+        <p><strong>Company:</strong> Milestone Soft Tech Pvt Ltd</p>
+        <p>69/2, Vikas Nagar, Devpuri, Raipur CG</p>
+        <p>Ph: 0771-4020500, 7587777550/51/52</p>
+      </td>
+      <td style={{ width: "50%", verticalAlign: "top", textAlign: "right" }}>
+        <p><strong>Party Name:</strong> {quotation.customerName}</p>
+        <p><strong>Address:</strong> {quotation.address}</p>
+        <p><strong>Contact:</strong> {quotation.customerContact}</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border text-sm">
@@ -231,7 +233,7 @@ const QuotationContent = () => {
                       {quotation.services && quotation.services.map((serviceItem, index) => (
                         <tr key={`service-${index}`}>
                           <td className="border px-3 py-2">{(quotation.items ? quotation.items.length : 0) + index + 1}</td>
-                          <td className="border px-3 py-2">{serviceItem.description}</td>
+                          <td className="border px-3 py-2"><strong>{serviceItem.name}</strong>  ({serviceItem.description})</td>
                           <td className="border px-3 py-2">1</td>
                           <td className="border px-3 py-2">{serviceItem.rate}</td>
                           <td className="border px-3 py-2">{parseFloat(serviceItem.rate).toFixed(2)}</td>

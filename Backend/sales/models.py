@@ -62,6 +62,7 @@ class QuotationForSale(Document):
     quotationNumber = StringField(required=True, max_length=50)
     customer = ReferenceField(Customer, required=True)
     customerName = StringField(max_length=100, required=True)  # Added for convenience
+    customerContact = StringField(max_length=10)  # Added for convenience
     items = ListField(DictField(allow_blank=True))  # List of dictionaries to hold item details
     services = ListField(DictField(allow_blank=True))
     status = StringField(default="Draft", choices=["Draft", "Sent", "Accepted", "Rejected","Expired" ])

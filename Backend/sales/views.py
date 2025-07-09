@@ -65,19 +65,41 @@ def quotation_list(request):
         quotations = QuotationForSale.objects.all()
         serializer = QuotationForSaleSerializer(quotations, many=True)
         return Response(serializer.data)
-    
+
     elif request.method == 'POST':
         print("Request data for quotation:", request.data)
-        # print("Request data for quotation:", request.data.get('items'))
-        data=request.data
+        data = request.data.copy()
+
+        # Clean up empty items list
+        if (
+            'items' in data and isinstance(data['items'], list)
+            and len(data['items']) == 1
+            and all(not v for v in data['items'][0].values())
+        ):
+            data['items'] = []
+
+        # Clean up empty services list
+        if (
+            'services' in data and isinstance(data['services'], list)
+            and len(data['services']) == 1
+            and all(not v for v in data['services'][0].values())
+        ):
+            data['services'] = []
+
+        # Get customer contact if customer is present
+        customer = Customer.objects.get(pk=data.get('customer')) if data.get('customer') else None
+        data['customerContact'] = customer.contact if customer else ""
+
         data['status'] = "Draft"  # Set default status to Draft
+
         serializer = QuotationForSaleSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         print("Serializer errors for quotation:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def quotation_detail(request, pk):

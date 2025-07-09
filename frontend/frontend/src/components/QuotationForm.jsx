@@ -356,7 +356,7 @@ const QuotationForm = () => {
                 <label className="block text-sm font-medium text-gray-700">Service Description *</label>
                 <input
                   type="text"
-                  value={newServiceData.name}
+                  value={newServiceData.name||""}
                   onChange={(e) => handleNewServiceChange("name", e.target.value)}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                  
@@ -366,12 +366,12 @@ const QuotationForm = () => {
                 <label className="block text-sm font-medium text-gray-700">Rate *</label>
                 <input
                   type="number"
-                  value={newServiceData.rate}
+                  value={newServiceData.rate||""}
                   onChange={(e) => handleNewServiceChange("rate", e.target.value)}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                   required
                   min="0"
-                  step="0.01"
+                  
                 />
               </div>
               <div className="text-right">
@@ -407,7 +407,7 @@ const QuotationForm = () => {
                 <label className="block text-sm font-medium text-gray-700">Product Name *</label>
                 <input
                   type="text"
-                  value={newProductData.name}
+                  value={newProductData.name||""}
                   onChange={(e) => handleNewProductChange("name", e.target.value)}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                   
@@ -422,7 +422,7 @@ const QuotationForm = () => {
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                   
                   min="0"
-                  step="0.01"
+                  
                 />
               </div>
               <div className="text-right">
@@ -537,7 +537,7 @@ const QuotationForm = () => {
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                   required
                   min="0"
-                  step="0.01"
+                  
                 />
               </div>
               <div className="flex items-end">
@@ -588,7 +588,7 @@ const QuotationForm = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Product *</label>
                 <select
-                  value={item.product_id}
+                  value={item.product_id||""}
                   onChange={(e) => handleItemChange(index, "product_id", e.target.value)}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                   
@@ -605,7 +605,7 @@ const QuotationForm = () => {
                 <label className="block text-sm font-medium text-gray-700">Quantity *</label>
                 <input
                   type="number"
-                  value={item.quantity}
+                  value={item.quantity||""}
                   onChange={(e) => handleItemChange(index, "quantity", e.target.value)}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                  
@@ -616,12 +616,12 @@ const QuotationForm = () => {
                 <label className="block text-sm font-medium text-gray-700">Unit Price</label>
                 <input
                   type="number"
-                  value={item.unit_price}
+                  value={item.unit_price||""}
                   onChange={(e) => handleItemChange(index, "unit_price", e.target.value)}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                  
                   min="0"
-                  step="0.01"
+                  
                 />
               </div>
               <div className="flex items-end">
@@ -646,7 +646,7 @@ const QuotationForm = () => {
                 onChange={(e) => handleDiscountTaxChange("discount", e.target.value)}
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 min="0"
-                step="0.01"
+                
               />
             </div>
             <div>
@@ -657,7 +657,7 @@ const QuotationForm = () => {
                 onChange={(e) => handleDiscountTaxChange("tax", e.target.value)}
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 min="0"
-                step="0.01"
+                
               />
             </div>
             <div>

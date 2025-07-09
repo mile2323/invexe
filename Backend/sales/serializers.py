@@ -185,6 +185,7 @@ class CustomerSerializer(DocumentSerializer):
     address = serializers.CharField(max_length=200, default="", allow_blank=True)
     contact = serializers.CharField(max_length=10, allow_blank=False, required=True)
     email = serializers.EmailField(max_length=100, allow_blank=True, required=False)
+    customerContact = serializers.CharField(max_length=10, allow_blank=True, required=False)    
     class Meta:
         model = Customer
         fields = '__all__'
