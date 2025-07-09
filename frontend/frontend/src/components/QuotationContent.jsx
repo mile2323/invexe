@@ -10,23 +10,21 @@ const QuotationContent = () => {
   const componentRef = useRef(null);
   const APIURL = import.meta.env.VITE_API_URL;
   const [quotation, setQuotation] = useState({});
-  const [items, setItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const { objectId } = useParams();
   const [loading, setLoading] = useState(false);
 
-
   const handleEmail = async () => {
-  try {
-    setLoading(true);
-    const response = await axios.get(`${APIURL}/sales/send-quotation-email/${quotation.id}/`);
-    setLoading(false);
-    alert("Email sent successfully!");
-  } catch (error) {
-    setLoading(false);
-    alert("Failed to send email.");
-  }
-};
+    try {
+      setLoading(true);
+      const response = await axios.get(`${APIURL}/sales/send-quotation-email/${quotation.id}/`);
+      setLoading(false);
+      alert("Email sent successfully!");
+    } catch (error) {
+      setLoading(false);
+      alert("Failed to send email.");
+    }
+  };
 
   const handlePrint = () => {
     if (componentRef.current) {
@@ -44,10 +42,13 @@ const QuotationContent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const response = await axios.get(`${APIURL}/sales/quotations/${objectId}/`);
         setQuotation(response.data);
+        setLoading(false);
       } catch (error) {
         console.error("Failed to fetch quotation data:", error);
+        setLoading(false);
         alert("Failed to load quotation data. Please try again.");
       }
     };
@@ -55,106 +56,126 @@ const QuotationContent = () => {
   }, [objectId, APIURL]);
 
   useEffect(() => {
-    setItems(quotation.items || []);
-    const subtotal =
-      quotation.items?.reduce((acc, item) => acc + item.quantity * item.unit_price, 0) || 0;
-    const afterDiscount = subtotal - (subtotal * (quotation.discount || 0)) / 100;
-    setTotalAmount(afterDiscount);
+    const calculateTotal = () => {
+      const itemSubtotal = (quotation.items || []).reduce((total, item) => {
+        const quantity = parseFloat(item.quantity) || 0;
+        const unitPrice = parseFloat(item.unit_price) || 0;
+        return total + quantity * unitPrice;
+      }, 0);
+
+      const serviceSubtotal = (quotation.services || []).reduce((total, service) => {
+        const rate = parseFloat(service.rate) || 0;
+        return total + rate;
+      }, 0);
+
+      const subtotal = itemSubtotal + serviceSubtotal;
+      console.log("Subtotal:", subtotal);
+      const afterDiscount = subtotal - (subtotal * (quotation.discount || 0)) / 100;
+      setTotalAmount(afterDiscount);
+    };
+
+    calculateTotal();
   }, [quotation]);
 
   const today = new Date().toLocaleDateString("en-IN");
 
   if (loading) {
     return (
-      <div class="mx-auto w-full max-w-sm rounded-md border border-blue-300 p-4">
-  <div class="flex animate-pulse space-x-4">
-    <div class="size-10 rounded-full bg-gray-200"></div>
-    <div class="flex-1 space-y-6 py-1">
-      <div class="h-2 rounded bg-gray-200"></div>
-      <div class="space-y-3">
-        <div class="grid grid-cols-3 gap-4">
-          <div class="col-span-2 h-2 rounded bg-gray-200"></div>
-          <div class="col-span-1 h-2 rounded bg-gray-200"></div>
+      <div className="mx-auto w-full max-w-sm rounded-md border border-blue-300 p-4">
+        <div className="flex animate-pulse space-x-4">
+          <div className="size-10 rounded-full bg-gray-200"></div>
+          <div className="flex-1 space-y-6 py-1">
+            <div className="h-2 rounded bg-gray-200"></div>
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-2 h-2 rounded bg-gray-200"></div>
+                <div className="col-span-1 h-2 rounded bg-gray-200"></div>
+              </div>
+              <div className="h-2 rounded bg-gray-200"></div>
+            </div>
+          </div>
         </div>
-        <div class="h-2 rounded bg-gray-200"></div>
       </div>
-    </div>
-  </div>
-</div>
     );
   }
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <style>
-  {`
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      .printable-area, .printable-area * {
-        visibility: visible;
-      }
-      .printable-area {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: white;
-        padding: 20px;
-      }
-      .heading-print {
-        font-size: 32px !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        margin-bottom: 24px !important;
-      }
-      .no-print {
-        display: none;
-      }
-    }
-  `}
-</style>
+        {`
+          @media print {
+            @page {
+              size: A4;
+              margin: 7.5mm;
+            }
+            .printable-area, .printable-area * {
+              visibility: visible;
+            }
+            .printable-area {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              background: white;
+              padding: 20px;
+            }
+            .heading-print {
+              font-size: 32px !important;
+              font-weight: bold !important;
+              text-align: center !important;
+              margin-bottom: 24px !important;
+            }
+            .no-print {
+              display: none;
+            }
+          }
+        `}
+      </style>
 
-      <div className="flex justify-between mb-4 ">
-  <h2 className="heading-print text-4xl font-bold mb-6 printable-area ">
-    Security Quotation
-  </h2>
-        <Button
-          onClick={handlePrint}
-          variant="outline"
-          disabled={!quotation.quotationNumber}
-        >
-          <Printer className="w-4 h-4 mr-2" />
-          Print / Download
-        </Button>
-        <Button
-      onClick={handleEmail}
-      variant="secondary"
-      disabled={!quotation.quotationNumber}
-    >
-      Send Email
-    </Button>
+      <div className="flex justify-between mb-4">
+        <h2 className="heading-print text-4xl font-bold mb-6 printable-area">
+          Security Quotation
+        </h2>
+        <div className="flex space-x-2">
+          <Button
+            onClick={handlePrint}
+            variant="outline"
+            disabled={!quotation.quotationNumber}
+            className="no-print"
+          >
+            <Printer className="w-4 h-4 mr-2" />
+            Print / Download
+          </Button>
+          <Button
+            onClick={handleEmail}
+            variant="secondary"
+            disabled={!quotation.quotationNumber}
+            className="no-print"
+          >
+            Send Email
+          </Button>
+        </div>
       </div>
 
       <div ref={componentRef} className="printable-area">
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
-            <div className="text-right">
-              <CardTitle>
-               {quotation.quotationNumber || "N/A"}/1
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">Date: {today}</p>
-            </div><div className="flex items-center space-x-4">
-      <img
-        src="/company_logo.png" // Update to the correct logo path (public folder or static)
-        alt="Company Logo"
-        className="h-12 w-auto"
-      />
-      <h1 className="text-2xl font-bold border-b-2 border-black pb-1">Milestone</h1>
-    </div>
-          </div>
+              <div className="text-right">
+                <CardTitle>
+                  {quotation.quotationNumber || "N/A"}/1
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">Date: {today}</p>
+              </div>
+              <div className="flex items-center space-x-4">
+                <img
+                  src="/company_logo.png"
+                  alt="Company Logo"
+                  className="h-12 w-auto"
+                />
+                <h1 className="text-2xl font-bold border-b-2 border-black pb-1">Milestone</h1>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="flex justify-between">
@@ -190,22 +211,33 @@ const QuotationContent = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {items.length === 0 ? (
+                  {(!quotation.items || quotation.items.length === 0) && (!quotation.services || quotation.services.length === 0) ? (
                     <tr>
                       <td colSpan="5" className="py-4 px-4 text-center text-gray-500">
-                        No quotation items found
+                        No quotation items or services found
                       </td>
                     </tr>
                   ) : (
-                    items.map((item, index) => (
-                      <tr key={index}>
-                        <td className="border px-3 py-2">{index + 1}</td>
-                        <td className="border px-3 py-2">{item.product_name}</td>
-                        <td className="border px-3 py-2">{item.quantity}</td>
-                        <td className="border px-3 py-2">{item.unit_price}</td>
-                        <td className="border px-3 py-2">{item.quantity * item.unit_price}</td>
-                      </tr>
-                    ))
+                    <>
+                      {quotation.items && quotation.items.map((item, index) => (
+                        <tr key={`item-${index}`}>
+                          <td className="border px-3 py-2">{index + 1}</td>
+                          <td className="border px-3 py-2">{item.product_name}</td>
+                          <td className="border px-3 py-2">{item.quantity}</td>
+                          <td className="border px-3 py-2">{item.unit_price}</td>
+                          <td className="border px-3 py-2">{(item.quantity * item.unit_price).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                      {quotation.services && quotation.services.map((serviceItem, index) => (
+                        <tr key={`service-${index}`}>
+                          <td className="border px-3 py-2">{(quotation.items ? quotation.items.length : 0) + index + 1}</td>
+                          <td className="border px-3 py-2">{serviceItem.description}</td>
+                          <td className="border px-3 py-2">1</td>
+                          <td className="border px-3 py-2">{serviceItem.rate}</td>
+                          <td className="border px-3 py-2">{parseFloat(serviceItem.rate).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </>
                   )}
                   <tr className="font-semibold">
                     <td colSpan="4" className="border px-3 py-2 text-right">
@@ -235,37 +267,66 @@ const QuotationContent = () => {
                       {(totalAmount + (totalAmount * (quotation.tax || 0) / 100)).toFixed(2)}
                     </td>
                   </tr>
+                  <tr className="font-bold">
+                    <td colSpan="2" className="border px-3 py-2 text-right">
+                      Amount In Words
+                    </td>
+                    <td colSpan="3" className="border px-3 py-2">
+                      {toWords(Math.floor((totalAmount + (totalAmount * (quotation.tax || 0) / 100)))).toUpperCase()} Rupees Only
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
 
-            <p className="mt-4 italic text-sm">
-              <strong>Amount in Words:</strong> {toWords(Math.floor((totalAmount + (totalAmount * (quotation.tax || 0) / 100)).toFixed(2))).toUpperCase()} Rupees Only
-            </p>
+            <table className="w-full table-fixed border border-black border-collapse">
+              <tbody>
+                <tr>
+                  <td className="w-[60%] border border-black p-4 align-top">
+                    <h4 className="font-semibold mb-2">Bank Account Details</h4>
+                    <ul className="list-disc ml-5">
+                      <li>Bank: BANK OF BARODA, PACHPEDI NAKA, RAIPUR</li>
+                      <li>A/c No: 86950500000005</li>
+                      <li>IFSC Code: BARB0DBPUCH</li>
+                      <li>In favor of: Milestone Soft Tech Pvt Ltd</li>
+                    </ul>
+                  </td>
+                  <td className="w-[40%] border border-black p-4 text-center align-top">
+                    <h4 className="font-semibold mb-2">Scan to Pay</h4>
+                    <img
+                      src="/qr-code.png"
+                      alt="QR Code"
+                      className="h-[150px] mx-auto"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-            <div>
-              <h4 className="font-semibold mt-6 mb-2">Bank Account Details</h4>
-              <ul className="list-disc ml-5">
-                <li>Bank: BANK OF BARODA, PACHPEDI NAKA, RAIPUR</li>
-                <li>A/c No: 86950500000005</li>
-                <li>IFSC Code: BARB0DBPUCH</li>
-                <li>In favor of: Milestone Soft Tech Pvt Ltd</li>
-              </ul>
-            </div>
-
-            <div className="mt-4 text-xs space-y-1 text-muted-foreground">
-              <p>
-                <strong>Note:</strong> Amount negotiable based on work scope.
-              </p>
-              <p>We declare this reflects actual service pricing.</p>
-              <p>Subject to Raipur Jurisdiction.</p>
-              <p>
-                <strong>PAN:</strong> AAGCM4183P | <strong>GST:</strong> 22AAGCM4183P2Z2
-              </p>
-            </div>
+            <table className="w-full border border-black border-collapse text-[0.85rem]">
+              <thead>
+                <tr>
+                  <th className="border border-black p-2 text-left">Important Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border border-black p-3">
+                    <ol className="ml-5 list-decimal">
+                      <li>GST will be applied as per government regulations.</li>
+                      <li>Advance payment is required if applicable.</li>
+                      <li>This quotation is valid for 15 days from the issue date.</li>
+                      <li>Delivery of products and services depends on availability.</li>
+                      <li>All disputes are subject to Raipur jurisdiction.</li>
+                      <li>This is an electronically generated quotation and does not require a physical signature.</li>
+                    </ol>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
             <div className="text-right font-semibold mt-6">
-              <p>Signature</p>
+             <p>Authorized Signatory</p>
             </div>
           </CardContent>
         </Card>

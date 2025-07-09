@@ -168,7 +168,7 @@
         <table>
           <thead>
             <tr>
-              <th>#</th>
+              <th style="width: 40px;">#</th>
               <th>Description of Products & Services</th>
               <th>Qty</th>
               <th>Rate</th>
@@ -177,18 +177,34 @@
           </thead>
           <tbody>
             {% for item in items %}
-            <tr>
-              <td>{{ forloop.counter }}</td>
-              <td>{{ item.product_name }}</td>
-              <td class="right">{{ item.quantity }}</td>
-              <td class="right">{{ item.unit_price }}</td>
-              <td class="right">{{ item.total }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="5" class="text-center">No quotation items found</td>
-            </tr>
-            {% endfor %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ item.product_name }}</td>
+    <td class="right">{{ item.quantity }}</td>
+    <td class="right">{{ item.unit_price }}</td>
+    <td class="right">{{ item.total }}</td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="5" class="text-center">No quotation items found</td>
+  </tr>
+  {% endfor %}
+
+  {% with items|length as offset %}
+    {% for service in services %}
+    <tr>
+      <td>{{ forloop.counter|add:offset }}</td>
+      <td>{{ service.description }}</td>
+      <td class="right">1</td>
+      <td class="right">{{ service.rate }}</td>
+      <td class="right">{{ service.rate }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="5" class="text-center">No quotation items found</td>
+    </tr>
+    {% endfor %}
+  {% endwith %}
             <tr class="font-semibold">
               <td colspan="4" class="right">Discount (%)</td>
               <td class="right">{{ quotation.discount|default:0 }}</td>

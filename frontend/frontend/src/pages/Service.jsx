@@ -1,24 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import Service from './Service';
 
 
-function Inventory() {
+function Service() {
   const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterTerm, setFilterTerm] = useState('');
   const APIURL = import.meta.env.VITE_API_URL;
 
-  // Fetch product data from backend
+  // Fetch service data from backend
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchservices = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${APIURL}/inventory/products`);
-        setProducts(response.data);
+        const response = await axios.get(`${APIURL}/inventory/service`);
+        setServices(response.data);
         console.log(response.data);
         setLoading(false);
       } catch (err) {
@@ -27,13 +26,12 @@ function Inventory() {
       }
     };
 
-     fetchProducts();
+     fetchservices();
   }, []); // Empty dependency array to run once on mount
 
   // Render loading state
   if (loading) {
     return (
-      
       <div className="container mx-auto p-4 bg-white p-6 rounded-lg shadow-md">
        <div className="relative rounded-lg isolate flex items-center gap-x-6 overflow-hidden bg-blue-50 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
       <div
@@ -65,13 +63,13 @@ function Inventory() {
       
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <div className="text-sm/6 text-gray-900">
-          <h1 className="text-2xl font-bold">Product List</h1>
+          <h1 className="text-2xl font-bold">Service List</h1>
           </div>
        
       </div>
       <div className="flex flex-1 justify-end">
         <button
-         onClick={() => navigate('/products')}
+         onClick={() => navigate('/Services')}
       type="button"
       className="rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
@@ -86,11 +84,9 @@ function Inventory() {
             <tr className="bg-gray-100">
 
                 <th className="py-2 px-4 border-b text-left">Action</th>
-              <th className="py-2 px-4 border-b text-left">Product ID</th>
-              <th className="py-2 px-4 border-b text-left">Product Name</th>
               <th className="py-2 px-4 border-b text-left">Description</th>
-              <th className="py-2 px-4 border-b text-left">Unit price</th>
-              <th className="py-2 px-4 border-b text-left">Stock</th>
+              <th className="py-2 px-4 border-b text-left">Rate</th>
+
             </tr>
           </thead>
           </table>
@@ -134,13 +130,13 @@ function Inventory() {
       
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <div className="text-sm/6 text-gray-900">
-          <h1 className="text-2xl font-bold">Product List</h1>
+          <h1 className="text-2xl font-bold">service List</h1>
           </div>
        
       </div>
       <div className="flex flex-1 justify-end">
         <button
-         onClick={() => navigate('/products/add')}
+         onClick={() => navigate('/services/add')}
       type="button"
       className="rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
@@ -153,12 +149,10 @@ function Inventory() {
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
             <tr className="bg-gray-100">
-              <th className="py-2 px-4 border-b text-left">Action</th>
-              <th className="py-2 px-4 border-b text-left">Product ID</th>
-              <th className="py-2 px-4 border-b text-left">Product Name</th>
+             <th className="py-2 px-4 border-b text-left">Action</th>
               <th className="py-2 px-4 border-b text-left">Description</th>
-              <th className="py-2 px-4 border-b text-left">Unit price</th>
-              <th className="py-2 px-4 border-b text-left">Stock</th>
+              <th className="py-2 px-4 border-b text-left">Rate</th>
+
             </tr>
           </thead>
           </table>
@@ -170,7 +164,6 @@ function Inventory() {
   }
 
   return (
-    <>
     <div className="container mx-auto p-4 bg-white p-6 rounded-lg shadow-md">
      <div className="relative rounded-lg isolate flex items-center overflow-hidden bg-blue-50 px-6 py-2.5 sm:px-3.5">
   {/* Background Decorations */}
@@ -198,15 +191,15 @@ function Inventory() {
     />
   </div>
 
-  {/* Center: Product List Title */}
+  {/* Center: service List Title */}
   <div className="absolute left-1/2 transform -translate-x-1/2">
-    <h1 className="text-2xl font-bold text-gray-900">Product List</h1>
+    <h1 className="text-2xl font-bold text-gray-900">service List</h1>
   </div>
 
   {/* Right: Add New Button */}
   <div className="ml-auto">
     <button
-      onClick={() => navigate('/products/add')}
+      onClick={() => navigate('/services/add')}
       type="button"
       className="rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
@@ -220,37 +213,30 @@ function Inventory() {
           <thead>
             <tr className="bg-gray-100">
               <th className="py-2 px-4 border-b text-left">Action</th>
-              <th className="py-2 px-4 border-b text-left">Product ID</th>
-              <th className="py-2 px-4 border-b text-left">Product Name</th>
               <th className="py-2 px-4 border-b text-left">Description</th>
-              <th className="py-2 px-4 border-b text-left">Unit price</th>
-              <th className="py-2 px-4 border-b text-left">Stock</th>
+              <th className="py-2 px-4 border-b text-left">Rate</th>
+
             </tr>
           </thead>
           <tbody>
-            {products.length === 0 ? (
+            {services.length === 0 ? (
               <tr>
                 <td colSpan="24" className="py-4 px-4 text-center text-gray-500">
-                  No Product found
+                  No service found
                 </td>
               </tr>
             ) : (
-              products.filter(
-                (product) =>
-                  product.name &&
-                  product.name.toLowerCase().includes(filterTerm.toLowerCase())
-              ).map((product, index) => (
-                <tr key={product.product_id || index} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b"><nav className="rounded-md bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"><Link to={`/products/edit/${product.id}`} >Edit</Link></nav></td>
+              services.filter(
+                (service) =>
+                  service.description &&
+                  service.description.toLowerCase().includes(filterTerm.toLowerCase())
+              ).map((service, index) => (
+                <tr key={service.id || index} className="hover:bg-gray-50">
+                  <td className="py-2 px-4 border-b"><nav className="rounded-md bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"><Link to={`/services/edit/${service.id}`} >Edit</Link></nav></td>
 
-                  <td className="py-2 px-4 border-b">{product.name || '-'}</td>
-                  <td className="py-2 px-4 border-b">{product.description || '-'}</td>
-                  <td className="py-2 px-4 border-b">
-                    {product.description || ''} 
-                  </td>
-                  <td className="py-2 px-4 border-b">{product.unit_price || '-'}</td>
-                  <td className="py-2 px-4 border-b">{product.quantity_in_stock || '-'}</td>
-                  
+                  <td className="py-2 px-4 border-b">{service.description || '-'}</td>
+                  <td className="py-2 px-4 border-b">{service.rate || '-'}</td>
+                 
                 </tr>
               ))
             )}
@@ -258,10 +244,7 @@ function Inventory() {
         </table>
       </div>
     </div>
-    <Service  />
-    </>
-
   );
 }
 
-export default Inventory;
+export default Service;

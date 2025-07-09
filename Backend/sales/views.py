@@ -21,7 +21,7 @@ def customer_list(request):
     if request.method == 'GET':
         customers = Customer.objects.all()
         serializer = CustomerSerializer(customers, many=True)
-        # print("Customers data:", serializer.data)
+        print("Customers data:", serializer.data)
         return Response(serializer.data)
     
     elif request.method == 'POST':
@@ -69,7 +69,9 @@ def quotation_list(request):
     elif request.method == 'POST':
         print("Request data for quotation:", request.data)
         # print("Request data for quotation:", request.data.get('items'))
-        serializer = QuotationForSaleSerializer(data=request.data)
+        data=request.data
+        data['status'] = "Draft"  # Set default status to Draft
+        serializer = QuotationForSaleSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -88,13 +90,10 @@ def quotation_detail(request, pk):
         serializer = QuotationForSaleSerializer(quotation)
         data= serializer.data
         contact = ""
-        contact=contact + quotation.customer.officeContact if quotation.customer and quotation.customer.officeContact else ""
-        contact=contact + ", " + quotation.customer.plantContact if quotation.customer and quotation.customer.plantContact else contact
-        contact=contact + ", " + quotation.customer.residenceContact if quotation.customer and quotation.customer.residenceContact else contact
-        contact=contact + ", " + quotation.customer.mobile if quotation.customer and quotation.customer.mobile else contact
-        data['contact'] = contact
+        contact=contact + quotation.customer.contact if quotation.customer and quotation.customer.contact else ""
+        
 
-        data['address']= quotation.customer.billingAddress.addressLine1 if quotation.customer and quotation.customer.billingAddress else ""
+        data['address']= quotation.customer.address if quotation.customer and quotation.customer.address else ""
         print("Quotation data:", data)
         return Response(data)
     
@@ -130,20 +129,45 @@ def send_quotation_email(request, quotation_id):
         return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
 
     contact = ""
-    contact=contact + customer.officeContact if customer and customer.officeContact else ""
-    contact=contact + ", " + customer.plantContact if customer and customer.plantContact else contact
-    contact=contact + ", " + customer.residenceContact if customer and customer.residenceContact else contact
-    contact=contact + ", " + customer.mobile if customer and customer.mobile else contact
+    contact=contact + customer.contact if customer and customer.contact else ""
+    
     # quotation['contact'] = contact
     # quotation['address']= customer.billingAddress.addressLine1 if customer and customer.billingAddress else ""
-    
-    print(contact)
-        
     items = quotation.items
-    for item in items:
-        item["total"] = float(item["quantity"]) * float(item["unit_price"])
+    
+    print(len(items))
+        
+    items = quotation.items or []
+    tempItems = items.copy()
+    for item in tempItems:
+        quantity = str(item.get("quantity", "")).strip()
+        unit_price = str(item.get("unit_price", "")).strip()
 
-    subtotal = sum(item["total"] for item in items)
+        if quantity and unit_price:
+            try:
+                item["total"] = float(quantity) * float(unit_price)
+            except ValueError:
+                item["total"] = 0.0  # fallback in case of invalid number format
+                items=[]
+        else:
+            item["total"] = 0.0
+            items=[]
+
+    services = quotation.services or []
+    for service in services:
+        rate = str(service.get("rate", "")).strip()
+        if rate:
+            try:
+                service["rate"] = float(rate)
+            except ValueError:
+                service["rate"] = 0.0
+        else:
+            service["rate"] = 0.0
+    servTotal = 0.0
+    for service in services:
+       servTotal += float(service["rate"]) 
+
+    subtotal = sum(item["total"] for item in items)+ servTotal
     after_discount = subtotal - (subtotal * (quotation.discount or 0) / 100)
     gst_amount = after_discount * (quotation.tax or 0) / 100
     grand_total = after_discount + gst_amount
@@ -161,6 +185,7 @@ def send_quotation_email(request, quotation_id):
     html_string = render_to_string("quotation_template.html", {
         "quotation": quotation,
         "items": items,
+        "services": services,
         "subtotal": after_discount,
         "gst_amount": gst_amount,
         "grand_total": grand_total,
@@ -168,8 +193,8 @@ def send_quotation_email(request, quotation_id):
         "amount_in_words": amount_in_words,
         "logo_base64": logo_base64,
         "contact": contact,
-        "address": customer.billingAddress.addressLine1 if customer and customer.billingAddress else "",
-    
+        "address": customer.address if customer and customer.address else "",
+
     })
 
     html = HTML(string=html_string)

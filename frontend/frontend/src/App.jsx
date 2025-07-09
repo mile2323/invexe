@@ -11,6 +11,9 @@ import Customer from './pages/Customer';
 import QuotationForm from './components/QuotationForm';
 import QuotationContent from './components/QuotationContent';
 import Quotation from './pages/Quotations';
+import CustomerForm from './components/CustomerForm';
+import AddService from './components/AddService';
+
 
 function App() {
   const APIURL = import.meta.env.VITE_API_URL;
@@ -33,12 +36,12 @@ function App() {
       />} />
 
       <Route path="/vendor/add-customer" element={
-        <VendorForm
+        <CustomerForm
           submitUrl={`${APIURL}/sales/customers/`}
           redirectPath="/customer"
           formTitle="Register New Customer"
         />} />
-      <Route path="/vendor/edit-customer/:objectId" element={<VendorForm
+      <Route path="/vendor/edit-customer/:objectId" element={<CustomerForm
         editUrl={`${APIURL}/sales/customers/`}
         redirectPath="/customer"
         formTitle="Edit Customer"
@@ -47,6 +50,9 @@ function App() {
       <Route path="/inventory" element={<Inventory />} />
       <Route path="/products/add" element={<AddProduct />} />
       <Route path="/products/edit/:objectId" element={<AddProduct />} />
+      <Route path="/services/add" element={<AddService />} />
+      <Route path="/services/edit/:objectId" element={<AddService />} />
+
       <Route path="/customer" element={<Customer />} />
       <Route path="/creat-quotation" element={<QuotationForm />} />
       <Route path="/quotation-content/:objectId" element={<QuotationContent />} />
