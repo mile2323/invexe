@@ -194,7 +194,7 @@
     {% for service in services %}
       <tr>
         <td>{{ forloop.counter|add:offset }}</td>
-        <td>{{ service.description }}</td>
+        <td>{{ service.name }} ({{ service.description }})</td>
         <td class="right">1</td>
         <td class="right">{{ service.rate }}</td>
         <td class="right">{{ service.rate }}</td>

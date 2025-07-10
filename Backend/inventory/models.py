@@ -13,7 +13,7 @@ class Product(BaseDocument):
     meta = {'collection': 'products'}
 
 class Service(BaseDocument):
-    name = StringField( max_length=100)
+    name = StringField( max_length=1000)
     description = StringField(max_length=500, allow_blank=True)
     rate = FloatField(allow_blank=True, default=0.0)
     meta = {'collection': 'services'}

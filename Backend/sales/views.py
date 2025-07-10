@@ -15,6 +15,24 @@ from weasyprint import HTML
 from datetime import datetime
 from num2words import num2words
 from django.contrib.staticfiles import finders
+import re
+
+def convert_qut_to_inv(text):
+    return re.sub(r'\bQUT(/[^/]+/[^/\s]+)', r'INV\1', text)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @api_view(['GET', 'POST'])
 def customer_list(request):
@@ -99,6 +117,30 @@ def quotation_list(request):
 
         print("Serializer errors for quotation:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def bill(request, pk):
+    try:
+        quotation = QuotationForSale.objects.get(pk=pk)
+    except QuotationForSale.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = QuotationForSaleSerializer(quotation)
+        data = serializer.data
+
+        
+        data = serializer.data
+        input_text = data['quotationNumber']
+        output_text = convert_qut_to_inv(input_text)
+        data['quotationNumber']= output_text
+        # print(data['quotationNumber'])
+       
+
+
+        return Response(data)
+
+    
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -229,6 +271,111 @@ def send_quotation_email(request, quotation_id):
         to=[quotation.customer.email]  # Assuming customer has an email field
     )
     email.attach(f"Quotation_{quotation.quotationNumber}.pdf", pdf_file, "application/pdf")
+    email.send()
+
+    return JsonResponse({"status": "email sent"})
+
+@api_view(['GET'])
+def send_bill_email(request, quotation_id):
+    try:
+        quotation = QuotationForSale.objects.get(pk=quotation_id)
+    except QuotationForSale.DoesNotExist:
+        return Response({"error": "Bill not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        customer = Customer.objects.get(pk=quotation.customer.id)
+    except Customer.DoesNotExist:
+        return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    contact = ""
+    contact=contact + customer.contact if customer and customer.contact else ""
+    
+    # quotation['contact'] = contact
+    # quotation['address']= customer.billingAddress.addressLine1 if customer and customer.billingAddress else ""
+    items = quotation.items
+    
+    print(len(items))
+        
+    items = quotation.items or []
+    tempItems = items.copy()
+    for item in tempItems:
+        quantity = str(item.get("quantity", "")).strip()
+        unit_price = str(item.get("unit_price", "")).strip()
+
+        if quantity and unit_price:
+            try:
+                item["total"] = float(quantity) * float(unit_price)
+            except ValueError:
+                item["total"] = 0.0  # fallback in case of invalid number format
+                items=[]
+        else:
+            item["total"] = 0.0
+            items=[]
+
+    services = quotation.services or []
+    for service in services:
+        rate = str(service.get("rate", "")).strip()
+        if rate:
+            try:
+                service["rate"] = float(rate)
+            except ValueError:
+                service["rate"] = 0.0
+        else:
+            service["rate"] = 0.0
+    servTotal = 0.0
+    for service in services:
+       servTotal += float(service["rate"]) 
+
+    subtotal = sum(item["total"] for item in items)+ servTotal
+    after_discount = subtotal - (subtotal * (quotation.discount or 0) / 100)
+    gst_amount = after_discount * (quotation.tax or 0) / 100
+    grand_total = after_discount + gst_amount
+
+    amount_in_words = num2words(grand_total, lang="en_IN").title() + " Only"
+
+    # Embed logo image as base64
+    logo_path = finders.find('images/company_logo.png')  # Only pass relative path inside 'static'
+
+    if not logo_path:
+        return Response({"error": "Logo image not found"}, status=500)
+    with open(logo_path, 'rb') as image_file:
+        logo_base64 = base64.b64encode(image_file.read()).decode('utf-8')
+    
+
+    
+    
+    input_text = quotation['quotationNumber']
+    output_text = convert_qut_to_inv(input_text)
+    quotation['quotationNumber'] = output_text
+
+
+
+
+    html_string = render_to_string("quotation_bill_template.html", {
+        "quotation": quotation,
+        "items": items,
+        "services": services,
+        "subtotal": after_discount,
+        "gst_amount": gst_amount,
+        "grand_total": grand_total,
+        "date": datetime.now().strftime("%d/%m/%Y"),
+        "amount_in_words": amount_in_words,
+        "logo_base64": logo_base64,
+        "contact": contact,
+        "address": customer.address if customer and customer.address else "",
+
+    })
+
+    html = HTML(string=html_string)
+    pdf_file = html.write_pdf()
+
+    email = EmailMessage(
+        subject=f"Bill {quotation.quotationNumber}",
+        body="Please find attached the Bill.",
+        from_email="mile2323@gmail.com",
+        to=[quotation.customer.email]  # Assuming customer has an email field
+    )
+    email.attach(f"Bill_{quotation.quotationNumber}.pdf", pdf_file, "application/pdf")
     email.send()
 
     return JsonResponse({"status": "email sent"})

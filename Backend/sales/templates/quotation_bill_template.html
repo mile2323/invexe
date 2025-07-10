@@ -1,0 +1,331 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    @page {
+      size: A4;
+      margin: 10mm 10mm 15mm 10mm;
+    }
+
+    body {
+      font-family: sans-serif;
+      background: white;
+      color: black;
+      padding: 0;
+      margin: 0;
+      font-size: 12px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .card {
+      border: 1px solid #000;
+      border-radius: 6px;
+      margin: 0 auto;
+      width: 190mm;
+      padding: 5mm;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .card-content {
+      padding: 1px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10pt;
+    }
+
+    th, td {
+      border: 1px solid #000;
+      padding: 2pt;
+      vertical-align: bottom;
+    }
+
+    th {
+      font-weight: 600;
+      background: #f5f5f5;
+    }
+
+    h1, h2 {
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      border-bottom: 2px solid #000;
+      padding-bottom: 4px;
+    }
+
+    h2 {
+      font-size: 24pt;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 16pt;
+      border-bottom: 2px solid #000;
+      letter-spacing: 1px;
+    }
+
+    .mt-4 {
+      margin-top: 12px;
+    }
+
+    .mt-6 {
+      margin-top: 16px;
+    }
+
+    .mb-2 {
+      margin-bottom: 6px;
+    }
+
+    .ml-5 {
+      margin-left: 18px;
+    }
+
+    .text-sm {
+      font-size: 11px;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .text-left {
+      text-align: left;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .font-bold {
+      font-weight: 700;
+    }
+
+    .font-semibold {
+      font-weight: 600;
+    }
+
+    .list-decimal {
+      list-style-type: decimal;
+    }
+
+   
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="card-content space-y-4 text-sm">
+      <!-- Company Info and Logo -->
+      <table style="margin-bottom: 1rem; font-size: 0.9rem; border-collapse: collapse;">
+  <tbody>
+    <tr>
+      <td class="border px-3 py-1 align-top" style="text-align: center;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 16px;">
+          <img src="data:image/png;base64,{{ logo_base64 }}" alt="Company Logo" style="height: 72px; width: auto;" />
+          <h1 class="font-bold" style="font-size: 24pt;">Milestone</h1>
+        </div>
+      </td>
+      <td class="border px-3 py-1 align-top company-info" style="width: 50%; text-align: left;">
+        <p style="margin: 0;">69/2, Vikas Nagar, Devpuri, Raipur CG, 492015</p>
+        <p style="margin: 0;">India, Ph: 0771-4020500, 7587777550/51/52</p>
+        <p style="margin: 0;">Email: milestonessoftech@gmail.com</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+      <!-- TAX-INVOICE Heading -->
+      <h2>TAX-INVOICE</h2>
+
+      <!-- Invoice and Party Details -->
+      
+  <table style="font-size: 0.9rem; border-collapse: collapse; width: 100%;">
+  <tbody>
+    <tr>
+      <td style="border: 1px solid #000; text-align: left;">
+        <strong>Invoice No:</strong> {{ quotation.quotationNumber|default:"N/A" }}
+      </td>
+      <td colspan="3" style="border: 1px solid #000; text-align: right;">
+        <strong>Date:</strong> {{ date }}
+      </td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; text-align: left;">
+        <strong>Party Name:</strong> {{ quotation.customerName|default:"N/A" }}
+      </td>
+      <td colspan="3" style="border: 1px solid #000; text-align: left;">
+        <strong>Address:</strong> {{ quotation.address|default:"N/A" }}
+      </td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; text-align: left;">
+        <strong>GST No:</strong>
+      </td>
+      <td style="border: 1px solid #000; text-align: right;">22AAALM0982ZJ</td>
+      <td style="border: 1px solid #000; text-align: right;">
+        <strong>State code:</strong>
+      </td>
+      <td style="border: 1px solid #000; text-align: right;">22</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; text-align: left;">
+        <strong>Kind Attention:</strong>
+      </td>
+      <td colspan="3" style="border: 1px solid #000; text-align: right;">
+        {{ quotation.contact|default:"N/A" }}
+      </td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; text-align: left;">
+        <strong>Work Order No.</strong>
+      </td>
+      <td style="border: 1px solid #000; text-align: left;">
+        <strong>Date</strong>
+      </td>
+      <td style="border: 1px solid #000; text-align: left;">
+        <strong>Payment Terms</strong>
+      </td>
+      <td style="border: 1px solid #000; text-align: left;">
+        <strong>Other Comments</strong>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" style="border: 1px solid #000; text-align: left;"></td>
+      <td style="border: 1px solid #000; text-align: left;">As per Order/Full</td>
+      <td style="border: 1px solid #000; text-align: left;"></td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+      <!-- Quotation Items and Services -->
+      <div class="overflow-x-auto">
+        <table>
+          <thead class="bg-muted">
+            <tr>
+              <th style="width: 40px;">No.</th>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Rate</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if items or services %}
+              {% for item in items %}
+                <tr>
+                  <td class="text-center"></td>>{{ forloop.counter }}</td>
+                  <td class="text-center"></td>>{{ item.product_name }}</td>
+                  <td class="text-center">{{ item.quantity }}</td>
+                  <td class="text-center">{{ item.unit_price }}</td>
+                  <td class="text-center">{{ item.total|floatformat:2 }}</td>
+                </tr>
+              {% endfor %}
+              {% with items|length as offset %}
+                {% for service in services %}
+                  <tr>
+                    <td>{{ forloop.counter|add:offset }}</td>
+                    <td><strong>{{ service.name }}</strong> ({{ service.description }})</td>
+                    <td class="text-right text-align: center;">1</td>
+                    <td class="text-right text-align: center;">{{ service.rate }}</td>
+                    <td class="text-right text-align: center;">{{ service.rate|floatformat:2 }}</td>
+                  </tr>
+                {% endfor %}
+              {% endwith %}
+            {% else %}
+              <tr>
+                <td colspan="5" class="text-center text-gray-500">No quotation items or services found</td>
+              </tr>
+            {% endif %}
+            <tr class="font-semibold">
+              <td colspan="4" class="text-right">Discount (%)</td>
+              <td class="text-right">{{ quotation.discount|default:0 }}</td>
+            </tr>
+            <tr class="font-semibold">
+              <td colspan="4" class="text-right">Subtotal</td>
+              <td class="text-right">{{ subtotal|floatformat:2 }}</td>
+            </tr>
+            <tr class="font-semibold" style="color: #1e40af;">
+              <td colspan="4" class="text-right">GST ({{ quotation.tax|default:0 }}%)</td>
+              <td class="text-right">{{ gst_amount|floatformat:2 }}</td>
+            </tr>
+            <tr class="font-bold" style="color: #15803d;">
+              <td colspan="4" class="text-right">Grand Total</td>
+              <td class="text-right">{{ grand_total|floatformat:2 }}</td>
+            </tr>
+            <tr class="font-bold">
+              <td colspan="2" class="text-right">Amount In Words</td>
+              <td colspan="3">{{ amount_in_words|default:"N/A" }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Company and Bank Details -->
+      <table style="margin-bottom: 1rem; font-size: 0.9rem; border-collapse: collapse; width: 100%;">
+  <tbody>
+    <tr>
+      <td style="border: 1px solid #000; text-align: center;"><strong>Company GST No:</strong></td>
+      <td colspan="3" style="border: 1px solid #000; text-align: center;">22AAALM0982ZJ</td>
+      <td colspan="1" style="border: 1px solid #000; text-align: left;"><strong>Bank A/c Details:</strong></td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; text-align: center;"><strong>Company State Code:</strong></td>
+      <td colspan="2" style="border: 1px solid #000; text-align: center;">22</td>
+      <td colspan="1" style="border: 1px solid #000; text-align: center;"><strong>A/C Name:</strong></td>
+      <td style="border: 1px solid #000; text-align: center;">MILESTONE SOFT TECH PVT LTD RAIPUR</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; text-align: center;"><strong>Company's Pan No:</strong></td>
+      <td colspan="3" style="border: 1px solid #000; text-align: center;">AAGCM418P2Z2</td>
+      <td colspan="3" style="border: 1px solid #000; text-align: center;"><strong>A/C No:</strong> 86950500000005</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; text-align: center;"><strong>Service Tax No:</strong></td>
+      <td colspan="3" style="border: 1px solid #000; text-align: center;"></td>
+      <td colspan="3" style="border: 1px solid #000; text-align: center;"><strong>IFSC CODE:</strong> BARB0DBPUCH</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; text-align: center;"></td>
+      <td colspan="3" style="border: 1px solid #000; text-align: center;"></td>
+      <td colspan="3" style="border: 1px solid #000; text-align: center;"><strong>BANK NAME:</strong> BANK OF BARODA, PACHPEDI NAKA, RAIPUR</td>
+    </tr>
+  </tbody>
+</table>
+
+
+      <!-- Declaration -->
+      <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; font-size: 0.85rem;">
+        <thead>
+          <tr>
+            <th class="border p-2 text-left">Declaration:</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="border p-3">
+              <ol class="ml-5 list-decimal">
+                <li>We Declare that this invoice shows the actual price of the goods/services described.</li>
+                <li>Cheque and demand drafts to be favour of Milestone Soft Tech Pvt Ltd. Raipur</li>
+                <li>All disputes are subject to Raipur jurisdiction.</li>
+              </ol>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Authorized Signatory -->
+      <div class="text-right font-semibold mt-6">
+        <p>Authorized Signatory</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

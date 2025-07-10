@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toWords } from 'number-to-words';
 
-const QuotationContent = () => {
+const Bill = () => {
   const componentRef = useRef(null);
   const APIURL = import.meta.env.VITE_API_URL;
   const [quotation, setQuotation] = useState({});
@@ -17,7 +17,7 @@ const QuotationContent = () => {
   const handleEmail = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${APIURL}/sales/send-quotation-email/${quotation.id}/`);
+      const response = await axios.get(`${APIURL}/sales/send-bill-email/${quotation.id}/`);
       setLoading(false);
       alert("Email sent successfully!");
     } catch (error) {
@@ -29,13 +29,13 @@ const QuotationContent = () => {
   const handlePrint = () => {
     if (componentRef.current) {
       setLoading(true);
-      document.title = "Security Quotation";
+      document.title = "Bill";
       window.print();
-      document.title = "Quotation App"; // Reset title after printing
+      document.title = "Bill"; // Reset title after printing
       setLoading(false);
     } else {
       setLoading(false);
-      alert("Quotation not ready to print yet.");
+      alert("Bill not ready to print yet.");
     }
   };
 
@@ -43,7 +43,7 @@ const QuotationContent = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${APIURL}/sales/quotations/${objectId}/`);
+        const response = await axios.get(`${APIURL}/sales/bill/${objectId}/`);
         setQuotation(response.data);
         setLoading(false);
       } catch (error) {
@@ -103,38 +103,79 @@ const QuotationContent = () => {
     <div className="p-6 bg-gray-100 min-h-screen">
       <style>
         {`
-          @media print {
-            @page {
-              size: A4;
-              margin: 7.5mm;
-            }
-            .printable-area, .printable-area * {
-              visibility: visible;
-            }
-            .printable-area {
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              background: white;
-              padding: 20px;
-            }
-            .heading-print {
-              font-size: 32px !important;
-              font-weight: bold !important;
-              text-align: center !important;
-              margin-bottom: 24px !important;
-            }
-            .no-print {
-              display: none;
-            }
-          }
-        `}
+  @media print {
+    @page {
+      size: A4;
+      margin: 10mm 10mm 15mm 10mm; /* top, right, bottom, left */
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact; /* preserve background colors */
+      print-color-adjust: exact;
+    }
+
+    .printable-area, .printable-area * {
+      visibility: visible;
+    }
+
+    .printable-area {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 190mm; /* A4 width minus 2x10mm margins */
+      max-height: 277mm; /* A4 height minus margins */
+      background: white;
+      padding: 10mm;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .heading-print {
+      font-size: 24pt !important;
+      font-weight: bold !important;
+      text-align: center !important;
+      margin-bottom: 16pt !important;
+    }
+
+    .no-print {
+      display: none !important;
+    }
+
+    /* Avoid content cutoff: force page breaks if needed */
+    .page-break {
+      page-break-before: always;
+      break-before: page;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table, th, td {
+      border: 1px solid black;
+    }
+
+    th, td {
+      padding: 4pt;
+      font-size: 10pt;
+    }
+
+    /* Remove unnecessary shadows, effects, etc. */
+    * {
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+  }
+`}
+
       </style>
 
       <div className="flex justify-between mb-4">
         <h2 className="heading-print text-4xl font-bold mb-6 printable-area">
-          Security Quotation
+          Bill
         </h2>
         <div className="flex space-x-2">
           <Button
@@ -157,17 +198,18 @@ const QuotationContent = () => {
         </div>
       </div>
 
-      <div ref={componentRef} className="printable-area">
+      <div ref={componentRef} className="printable-area " style={{ width: "794px" }}>
         <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <div className="text-right">
-                <CardTitle>
-                  {quotation.quotationNumber || "N/A"}
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">Date: {today}</p>
-              </div>
-              <div className="flex items-center space-x-4">
+          
+          <CardContent className="space-y-4 text-sm">
+            
+
+
+              <table className="w-full text-left border text-sm" style={{ marginBottom: "1rem", fontSize: "0.9rem", borderCollapse: "collapse" }}>
+  <tbody>
+    <tr>
+      <td className="border px-3 py-1 align-top" style={{  textAlign: "left" }}>
+         <div className="flex items-center space-x-4">
                 <img
                   src="/company_logo.png"
                   alt="Company Logo"
@@ -175,31 +217,88 @@ const QuotationContent = () => {
                 />
                 <h1 className="text-2xl font-bold border-b-2 border-black pb-1">Milestone</h1>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm">
-            <table style={{ width: "100%", marginBottom: "1rem", fontSize: "0.9rem" }}>
-  <thead>
-    <tr>
-      <th style={{ textAlign: "left" }}>From (Company)</th>
-      <th style={{ textAlign: "right" }}>To (Party)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
+      </td>
       <td style={{ width: "50%", verticalAlign: "top", textAlign: "left" }}>
-        <p><strong>Company:</strong> Milestone Soft Tech Pvt Ltd</p>
-        <p>69/2, Vikas Nagar, Devpuri, Raipur CG</p>
-        <p>Ph: 0771-4020500, 7587777550/51/52</p>
-      </td>
-      <td style={{ width: "50%", verticalAlign: "top", textAlign: "right" }}>
-        <p><strong>Party Name:</strong> {quotation.customerName}</p>
-        <p><strong>Address:</strong> {quotation.address}</p>
-        <p><strong>Contact:</strong> {quotation.customerContact}</p>
+        <p>69/2, Vikas Nagar, Devpuri, Raipur CG, 492015</p>
+        <p>India, Ph: 0771-4020500, 7587777550/51/52</p>
+        <p>Email : milestonessoftech@gmail.com</p>
       </td>
     </tr>
+   
   </tbody>
 </table>
+<h2
+  style={{
+    fontSize: '28px',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: '16px',
+    borderBottom: '2px solid #000',
+    display: 'block',
+    letterSpacing: '1px',
+  }}
+>
+ TAX-INVOICE
+</h2>
+      
+
+    <table style={{ fontSize: '0.9rem', borderCollapse: 'collapse', width: '100%' }}>
+      <tbody>
+        <tr>
+          <td style={{ border: '1px solid #000', textAlign: 'left' }}>
+            <strong>Invoice No:</strong> {quotation.quotationNumber || 'N/A'}
+          </td>
+          <td colSpan="3" style={{ border: '1px solid #000', textAlign: 'right' }}>
+            <strong>Date:</strong> {today}
+          </td>
+        </tr>
+        <tr>
+          <td style={{ border: '1px solid #000', textAlign: 'left' }}>
+            <strong>Party Name:</strong> {quotation.customerName || 'N/A'}
+          </td>
+          <td colSpan="3" style={{ border: '1px solid #000', textAlign: 'left' }}>
+            <strong>Address:</strong> {quotation.address || 'N/A'}
+          </td>
+        </tr>
+        <tr>
+          <td style={{ border: '1px solid #000', textAlign: 'left' }}>
+            <strong>GST No:</strong>
+          </td>
+          <td style={{ border: '1px solid #000', textAlign: 'right' }}>22AAALM0982ZJ</td>
+          <td style={{ border: '1px solid #000', textAlign: 'right' }}>
+            <strong>State code:</strong>
+          </td>
+          <td style={{ border: '1px solid #000', textAlign: 'right' }}>22</td>
+        </tr>
+        <tr>
+          <td style={{ border: '1px solid #000', textAlign: 'left' }}>
+            <strong>Kind Attention:</strong>
+          </td>
+          <td colSpan="3" style={{ border: '1px solid #000', textAlign: 'right' }}>
+            
+          </td>
+        </tr>
+        <tr>
+          <td style={{ border: '1px solid #000', textAlign: 'left' }}>
+            <strong>Work Order No.</strong>
+          </td>
+          <td style={{ border: '1px solid #000', textAlign: 'left' }}>
+            <strong>Date</strong>
+          </td>
+          <td style={{ border: '1px solid #000', textAlign: 'left' }}>
+            <strong>Payment Terms</strong>
+          </td>
+          <td style={{ border: '1px solid #000', textAlign: 'left' }}>
+            <strong>Other Comments</strong>
+          </td>
+        </tr>
+        <tr>
+          <td colSpan="2" style={{ border: '1px solid #000', textAlign: 'left' }}></td>
+          <td style={{ border: '1px solid #000', textAlign: 'left' }}>As per Order/Full</td>
+          <td style={{ border: '1px solid #000', textAlign: 'left' }}></td>
+        </tr>
+      </tbody>
+    </table>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border text-sm">
@@ -280,47 +379,77 @@ const QuotationContent = () => {
                 </tbody>
               </table>
             </div>
+             <table className="w-full text-left border text-sm" style={{ marginBottom: "1rem", fontSize: "0.9rem", borderCollapse: "collapse" }}>
+  <tbody>
+    
+    <tr>
+      <td className="border px-3 py-1 align-top" style={{ textAlign: "left" }}>
+        <strong>Company GST No:</strong>
+      </td>
+    <td className="border px-3 py-1 align-top" colSpan={3} style={{ textAlign: "left" }}>22AAALM0982ZJ</td>
+    <td className="border px-3 py-1 align-top" colSpan={1} style={{ textAlign: "left" }}><strong>Bank A/c Details:</strong></td>
 
-            <table className="w-full table-fixed border border-black border-collapse">
-              <tbody>
-                <tr>
-                  <td className="w-[60%] border border-black p-4 align-top">
-                    <h4 className="font-semibold mb-2">Bank Account Details</h4>
-                    <ul className="list-disc ml-5">
-                      <li>Bank: BANK OF BARODA, PACHPEDI NAKA, RAIPUR</li>
-                      <li>A/c No: 86950500000005</li>
-                      <li>IFSC Code: BARB0DBPUCH</li>
-                      <li>In favor of: Milestone Soft Tech Pvt Ltd</li>
-                    </ul>
-                  </td>
-                  <td className="w-[40%] border border-black p-4 text-center align-top">
-                    <h4 className="font-semibold mb-2">Scan to Pay</h4>
-                    <img
-                      src="/qr-code.png"
-                      alt="QR Code"
-                      className="h-[150px] mx-auto"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+    </tr>
+    <tr>
+      <td className="border px-3 py-1 align-top" style={{ textAlign: "left" }}>
+        <strong>Company State Code:</strong>
+      </td>
+      <td className="border px-3 py-1 align-top text-center" colSpan={2} style={{ verticalAlign: "middle" }} >22</td>
+      <td className="border px-3 py-1 align-top text-[14px]" colSpan={1} style={{ textAlign: "left" }}>
+        <strong>A/C Name:</strong>
+      </td>
+      <td className="border px-3 py-1 align-top" style={{ textAlign: "left" }}>
+        MILESTONE SOFT TECH PVT LTD RAIPUR
+      </td>
+    </tr>
+    <tr>
+      <td className="border px-3 py-1 align-top" style={{ textAlign: "left" }}>
+        <strong>Company's Pan No:</strong>
+      </td>
+      <td className="border px-3 py-1 align-top text-center" colSpan={3} style={{ verticalAlign: "middle" }}>
+        AAGCM418P2Z2
+      </td><td className="border px-3 py-1 align-top" colSpan={3} style={{ textAlign: "left" }}>
+        <strong>A/C No:</strong> 86950500000005
+      </td>
+    </tr>
+     <tr>
+      <td className="border px-3 py-1 align-top" style={{ textAlign: "left" }}>
+        <strong>Service Tax No:</strong>
+      </td>
+      <td className="border px-3 py-1 align-top" colSpan={3} style={{ textAlign: "left" }}>
+       </td><td className="border px-3 py-1 align-top" colSpan={3} style={{ textAlign: "left" }}>
+        <strong>IFSC CODE:-</strong> BARB0DBPUCH
+      </td>
+    </tr>
+     <tr>
+      <td className="border px-3 py-1 align-top" style={{ textAlign: "left" }}>
+        
+      </td>
+      <td className="border px-3 py-1 align-top" colSpan={3} style={{ textAlign: "right" }}>
+       </td>
+       <td className="border px-3 py-1 align-top" colSpan={3} style={{ textAlign: "right" }}>
+        <strong>BANK NAME:-</strong> BANK OF BARODA, PACHPEDI NAKA, RAIPUR
+      </td>
+    </tr>
+    
+  </tbody>
+</table>
+
+           
 
             <table className="w-full border border-black border-collapse text-[0.85rem]">
               <thead>
                 <tr>
-                  <th className="border border-black p-2 text-left">Important Notes</th>
+                  <th className="border border-black p-2 text-left">Declearation:-</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td className="border border-black p-3">
                     <ol className="ml-5 list-decimal">
-                      <li>GST will be applied as per government regulations.</li>
-                      <li>Advance payment is required if applicable.</li>
-                      <li>This quotation is valid for 15 days from the issue date.</li>
-                      <li>Delivery of products and services depends on availability.</li>
+                      <li>We Declare that this invoice shows the actual price of the goods/services described.</li>
+                      <li>Cheque and demand drafts to be favour of Milestone Soft Tech Pvt Ltd. Raipur</li>
                       <li>All disputes are subject to Raipur jurisdiction.</li>
-                      <li>This is an electronically generated quotation and does not require a physical signature.</li>
                     </ol>
                   </td>
                 </tr>
@@ -337,4 +466,4 @@ const QuotationContent = () => {
   );
 };
 
-export default QuotationContent;
+export default Bill;

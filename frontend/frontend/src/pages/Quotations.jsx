@@ -236,7 +236,17 @@ function Quotation() {
                   quotation.customerName.toLowerCase().includes(filterTerm.toLowerCase())
               ).map((quotation, index) => (
                 <tr key={quotation.id || index} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b"><nav className="rounded-md bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"><Link to={`/quotation-content/${quotation.id}`} >View</Link></nav></td>
+                  
+                  <td className="py-2 px-4 border-b">
+  <div className="flex gap-2">
+    <nav className="rounded-md bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+      <Link to={`/quotation-content/${quotation.id}`}>View</Link>
+    </nav>
+    <nav className="rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <Link to={`/quotation-bill/${quotation.id}`}>Bill</Link>
+    </nav>
+  </div>
+</td>
 
                   <td className="py-2 px-4 border-b">{quotation.quotationNumber || '-'}</td>
                   <td className="py-2 px-4 border-b">

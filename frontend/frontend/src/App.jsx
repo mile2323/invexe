@@ -13,6 +13,7 @@ import QuotationContent from './components/QuotationContent';
 import Quotation from './pages/Quotations';
 import CustomerForm from './components/CustomerForm';
 import AddService from './components/AddService';
+import Bill from './components/Bill';
 
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
       <Route path="/customer" element={<Customer />} />
       <Route path="/creat-quotation" element={<QuotationForm />} />
       <Route path="/quotation-content/:objectId" element={<QuotationContent />} />
+      <Route path="/quotation-bill/:objectId" element={<Bill />} />
       <Route path="/quotations" element={<Quotation />} />
     </Routes>
   );
