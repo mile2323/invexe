@@ -5,6 +5,7 @@ import { Printer } from "lucide-react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toWords } from 'number-to-words';
+import BillForm from "./BillForm";
 
 const Bill = () => {
   const componentRef = useRef(null);
@@ -13,6 +14,7 @@ const Bill = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const { objectId } = useParams();
   const [loading, setLoading] = useState(false);
+  const [billGenrated,setBillGenrated] = useState(false)
 
   const handleEmail = async () => {
     try {
@@ -46,6 +48,7 @@ const Bill = () => {
         const response = await axios.get(`${APIURL}/sales/bill/${objectId}/`);
         setQuotation(response.data);
         setLoading(false);
+        setBillGenrated(response.data.billGenrated);
       } catch (error) {
         console.error("Failed to fetch quotation data:", error);
         setLoading(false);
@@ -100,6 +103,8 @@ const Bill = () => {
   }
 
   return (
+    <>
+    {billGenrated?
     <div className="p-6 bg-gray-100 min-h-screen">
       <style>
         {`
@@ -463,6 +468,7 @@ const Bill = () => {
         </Card>
       </div>
     </div>
+   :<BillForm  objId={objectId} />}</>
   );
 };
 

@@ -523,7 +523,7 @@ const QuotationForm = () => {
                   value={service.description}
                   onChange={(e) => handleServiceChange(index, "description", e.target.value)}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                  required
+                 
                 />
                   
                 
