@@ -311,99 +311,98 @@ def send_bill_email(request, quotation_id):
     try:
         quotation = QuotationForSale.objects.get(pk=quotation_id)
     except QuotationForSale.DoesNotExist:
-        return Response({"error": "Bill not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "Quotation not found"}, status=status.HTTP_404_NOT_FOUND)
 
     try:
         customer = Customer.objects.get(pk=quotation.customer.id)
     except Customer.DoesNotExist:
         return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    contact = ""
-    contact=contact + customer.contact if customer and customer.contact else ""
-    
-    # quotation['contact'] = contact
-    # quotation['address']= customer.billingAddress.addressLine1 if customer and customer.billingAddress else ""
-    items = quotation.items
-    
-    print(len(items))
-        
+    try:
+        bill = BillForSale.objects.get(quotation=quotation_id)
+    except BillForSale.DoesNotExist:
+        return Response({"error": "Bill not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Prepare data
+    contact = customer.contact if customer and customer.contact else "N/A"
+    address = customer.address if customer and customer.address else "N/A"
+
+    # Calculate item totals
     items = quotation.items or []
-    tempItems = items.copy()
-    for item in tempItems:
-        quantity = str(item.get("quantity", "")).strip()
-        unit_price = str(item.get("unit_price", "")).strip()
+    for item in items:
+        quantity = float(item.get("quantity", 0)) if item.get("quantity") else 0
+        unit_price = float(item.get("unit_price", 0)) if item.get("unit_price") else 0
+        item["total"] = quantity * unit_price
 
-        if quantity and unit_price:
-            try:
-                item["total"] = float(quantity) * float(unit_price)
-            except ValueError:
-                item["total"] = 0.0  # fallback in case of invalid number format
-                items=[]
-        else:
-            item["total"] = 0.0
-            items=[]
-
+    # Calculate service totals
     services = quotation.services or []
     for service in services:
-        rate = str(service.get("rate", "")).strip()
-        if rate:
-            try:
-                service["rate"] = float(rate)
-            except ValueError:
-                service["rate"] = 0.0
-        else:
-            service["rate"] = 0.0
-    servTotal = 0.0
-    for service in services:
-       servTotal += float(service["rate"]) 
+        service["rate"] = float(service.get("rate", 0)) if service.get("rate") else 0
 
-    subtotal = sum(item["total"] for item in items)+ servTotal
-    after_discount = subtotal - (subtotal * (quotation.discount or 0) / 100)
-    gst_amount = after_discount * (quotation.tax or 0) / 100
-    grand_total = after_discount + gst_amount
+    # Calculate total amount
+    item_subtotal = sum(item["total"] for item in items)
+    service_subtotal = sum(service["rate"] for service in services)
+    total_amount = item_subtotal + service_subtotal
 
-    amount_in_words = num2words(grand_total, lang="en_IN").title() + " Only"
+    # Calculate other taxes
+    other_tax = bill.otherTax or []
+    for tax in other_tax:
+        tax_value = float(tax.get("value", 0)) if tax.get("value") else 0
+        tax["amount"] = total_amount * tax_value / 100
+
+    # Calculate other charges
+    other_charges = bill.otherCharges or []
+    for charge in other_charges:
+        charge["rate"] = float(charge.get("rate", 0)) if charge.get("rate") else 0
+
+    # Calculate grand total
+    other_tax_total = sum(tax["amount"] for tax in other_tax)
+    other_charge_total = sum(charge["rate"] for charge in other_charges)
+    grand_total = total_amount + other_tax_total + other_charge_total
+    after_discount = grand_total - (grand_total * (0 / 100))
+    gst_amount = after_discount * (float(quotation.tax or 0) / 100)
+    net_amount = after_discount + gst_amount
+    round_off = net_amount - int(net_amount)
+    net_payable = int(net_amount)
+    amount_in_words = num2words(net_payable, lang="en_IN").title()
 
     # Embed logo image as base64
-    logo_path = finders.find('images/company_logo.png')  # Only pass relative path inside 'static'
-
+    logo_path = finders.find('images/company_logo.png')
     if not logo_path:
-        return Response({"error": "Logo image not found"}, status=500)
+        return Response({"error": "Logo image not found"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     with open(logo_path, 'rb') as image_file:
         logo_base64 = base64.b64encode(image_file.read()).decode('utf-8')
-    
 
-    
-    
-    input_text = quotation['quotationNumber']
-    output_text = convert_qut_to_inv(input_text)
-    quotation['quotationNumber'] = output_text
+    # Convert quotation number to invoice number
+    bill_number = convert_qut_to_inv(quotation.quotationNumber) if quotation.quotationNumber else "N/A"
 
-
-
-
+    # Render HTML template
     html_string = render_to_string("quotation_bill_template.html", {
         "quotation": quotation,
+        "bill": bill,
         "items": items,
         "services": services,
-        "subtotal": after_discount,
+        "total_amount": total_amount,
+        "grand_total": after_discount,
         "gst_amount": gst_amount,
-        "grand_total": grand_total,
-        "date": datetime.now().strftime("%d/%m/%Y"),
+        "net_amount": net_amount,
+        "round_off": round_off,
+        "net_payable": net_payable,
         "amount_in_words": amount_in_words,
+        "date": datetime.now().strftime("%d/%m/%Y"),
         "logo_base64": logo_base64,
         "contact": contact,
-        "address": customer.address if customer and customer.address else "",
-
+        "address": address,
     })
 
+    # Generate PDF
     html = HTML(string=html_string)
     pdf_file = html.write_pdf()
 
     email = EmailMessage(
         subject=f"Bill {quotation.quotationNumber}",
         body="Please find attached the Bill.",
-        from_email="mile2323@gmail.com",
+        from_email="mile2323stoen@gmail.com",
         to=[quotation.customer.email]  # Assuming customer has an email field
     )
     email.attach(f"Bill_{quotation.quotationNumber}.pdf", pdf_file, "application/pdf")

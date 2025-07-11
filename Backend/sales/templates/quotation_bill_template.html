@@ -28,27 +28,34 @@
       padding: 5mm;
       box-sizing: border-box;
       overflow: hidden;
+      break-inside: avoid;
     }
 
     .card-content {
       padding: 1px;
+      font-size: 11px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 10pt;
+      break-inside: avoid;
+      page-break-inside: avoid;
+      border-color: #000000 !important;
     }
 
     th, td {
-      border: 1px solid #000;
+      border: 1px solid #000000 !important;
       padding: 2pt;
       vertical-align: bottom;
+      color: #000000 !important;
+      background: #FFFFFF !important;
     }
 
     th {
       font-weight: 600;
-      background: #f5f5f5;
+      background: #f5f5f5 !important;
     }
 
     h1, h2 {
@@ -113,17 +120,15 @@
 
     .list-decimal {
       list-style-type: decimal;
+      margin-left: 18px;
     }
-
-   
   </style>
 </head>
-
 <body>
   <div class="card">
-    <div class="card-content space-y-4 text-sm">
+    <div class="card-content text-sm">
       <!-- Company Info and Logo -->
-      <table style="margin-bottom: 1rem; font-size: 0.9rem; border-collapse: collapse;">
+     <table style="margin-bottom: 1rem; font-size: 0.9rem; border-collapse: collapse;">
   <tbody>
     <tr>
       <td class="border px-3 py-1 align-top" style="text-align: center;">
@@ -140,177 +145,231 @@
     </tr>
   </tbody>
 </table>
+
       <!-- TAX-INVOICE Heading -->
       <h2>TAX-INVOICE</h2>
 
       <!-- Invoice and Party Details -->
-      
-  <table style="font-size: 0.9rem; border-collapse: collapse; width: 100%;">
-  <tbody>
-    <tr>
-      <td style="border: 1px solid #000; text-align: left;">
-        <strong>Invoice No:</strong> {{ quotation.quotationNumber|default:"N/A" }}
-      </td>
-      <td colspan="3" style="border: 1px solid #000; text-align: right;">
-        <strong>Date:</strong> {{ date }}
-      </td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #000; text-align: left;">
-        <strong>Party Name:</strong> {{ quotation.customerName|default:"N/A" }}
-      </td>
-      <td colspan="3" style="border: 1px solid #000; text-align: left;">
-        <strong>Address:</strong> {{ quotation.address|default:"N/A" }}
-      </td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #000; text-align: left;">
-        <strong>GST No:</strong>
-      </td>
-      <td style="border: 1px solid #000; text-align: right;">22AAALM0982ZJ</td>
-      <td style="border: 1px solid #000; text-align: right;">
-        <strong>State code:</strong>
-      </td>
-      <td style="border: 1px solid #000; text-align: right;">22</td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #000; text-align: left;">
-        <strong>Kind Attention:</strong>
-      </td>
-      <td colspan="3" style="border: 1px solid #000; text-align: right;">
-        {{ quotation.contact|default:"N/A" }}
-      </td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #000; text-align: left;">
-        <strong>Work Order No.</strong>
-      </td>
-      <td style="border: 1px solid #000; text-align: left;">
-        <strong>Date</strong>
-      </td>
-      <td style="border: 1px solid #000; text-align: left;">
-        <strong>Payment Terms</strong>
-      </td>
-      <td style="border: 1px solid #000; text-align: left;">
-        <strong>Other Comments</strong>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" style="border: 1px solid #000; text-align: left;"></td>
-      <td style="border: 1px solid #000; text-align: left;">As per Order/Full</td>
-      <td style="border: 1px solid #000; text-align: left;"></td>
-    </tr>
-  </tbody>
-</table>
-
-
+      <table style="font-size: 0.9rem; border-collapse: collapse; width: 100%;">
+        <tbody>
+          <tr>
+            <td style="border: 1px solid #000000; text-align: left;">
+              <strong>Invoice No:</strong> {{ bill.invoiceNo|default:"N/A" }}
+            </td>
+            <td colspan="3" style="border: 1px solid #000000; text-align: right;">
+              <strong>Date:</strong> {{ date }}
+            </td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #000000; text-align: left;">
+              <strong>Party Name:</strong> {{ quotation.customerName|default:"N/A" }}
+            </td>
+            <td colspan="3" style="border: 1px solid #000000; text-align: left;">
+              <strong>Address:</strong> {{ quotation.address|default:"N/A" }}
+            </td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #000000; text-align: left;">
+              <strong>GST No:</strong>
+            </td>
+            <td style="border: 1px solid #000000; text-align: right;">22AAALM0982ZJ</td>
+            <td style="border: 1px solid #000000; text-align: right;">
+              <strong>State code:</strong>
+            </td>
+            <td style="border: 1px solid #000000; text-align: right;">22</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #000000; text-align: left;">
+              <strong>Kind Attention:</strong>
+            </td>
+            <td colspan="3" style="border: 1px solid #000000; text-align: right;">
+              {{ contact|default:"N/A" }}
+            </td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #000000; text-align: left;">
+              <strong>Work Order No.</strong>
+            </td>
+            <td style="border: 1px solid #000000; text-align: left;">
+              <strong>Date</strong> {{ date }}
+            </td>
+            <td style="border: 1px solid #000000; text-align: left;">
+              <strong>Payment Terms</strong>
+            </td>
+            <td style="border: 1px solid #000000; text-align: left;">
+              <strong>Other Comments</strong>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" style="border: 1px solid #000000; text-align: left;">
+              No.{{ bill.workOrderNo|default:"N/A" }}
+            </td>
+            <td style="border: 1px solid #000000; text-align: left;">As per Order/Full</td>
+            <td style="border: 1px solid #000000; text-align: left;">{{ bill.comments|default:"N/A" }}</td>
+          </tr>
+        </tbody>
+      </table>
 
       <!-- Quotation Items and Services -->
-      <div class="overflow-x-auto">
-        <table>
-          <thead class="bg-muted">
+      <div style="overflow-x: auto;" class="mt-4">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
             <tr>
-              <th style="width: 40px;">No.</th>
-              <th>Description</th>
-              <th>Qty</th>
-              <th>Rate</th>
-              <th>Amount</th>
+              <th class="border px-2 py-1">No.</th>
+              <th class="border px-2 py-1">Description</th>
+              <th class="border px-2 py-1">Qty</th>
+              <th class="border px-2 py-1">Rate</th>
+              <th class="border px-2 py-1">Amount</th>
             </tr>
           </thead>
           <tbody>
-            {% if items or services %}
+            {% if not items and not services %}
+              <tr>
+                <td colspan="5" class="py-2 px-2 text-center">No quotation items or services found</td>
+              </tr>
+            {% else %}
               {% for item in items %}
                 <tr>
-                  <td class="text-center"></td>>{{ forloop.counter }}</td>
-                  <td class="text-center"></td>>{{ item.product_name }}</td>
-                  <td class="text-center">{{ item.quantity }}</td>
-                  <td class="text-center">{{ item.unit_price }}</td>
-                  <td class="text-center">{{ item.total|floatformat:2 }}</td>
+                  <td class="border px-2 py-1">{{ forloop.counter }}</td>
+                  <td class="border px-2 py-1">{{ item.product_name }}</td>
+                  <td class="border px-2 py-1">{{ item.quantity }}</td>
+                  <td class="border px-2 py-1">{{ item.unit_price }}</td>
+                  <td class="border px-2 py-1">{{ item.total|floatformat:2 }}</td>
                 </tr>
               {% endfor %}
               {% with items|length as offset %}
                 {% for service in services %}
                   <tr>
-                    <td>{{ forloop.counter|add:offset }}</td>
-                    <td><strong>{{ service.name }}</strong> ({{ service.description }})</td>
-                    <td class="text-right text-align: center;">1</td>
-                    <td class="text-right text-align: center;">{{ service.rate }}</td>
-                    <td class="text-right text-align: center;">{{ service.rate|floatformat:2 }}</td>
+                    <td class="border px-2 py-1">{{ forloop.counter|add:offset }}</td>
+                    <td class="border px-2 py-1">
+                      <strong>{{ service.name }}</strong> ({{ service.description }})
+                    </td>
+                    <td class="border px-2 py-1">1</td>
+                    <td class="border px-2 py-1">{{ service.rate }}</td>
+                    <td class="border px-2 py-1">{{ service.rate|floatformat:2 }}</td>
                   </tr>
                 {% endfor %}
               {% endwith %}
-            {% else %}
-              <tr>
-                <td colspan="5" class="text-center text-gray-500">No quotation items or services found</td>
+              <tr class="font-semibold">
+                <td colspan="4" class="border px-2 py-1 text-right">Total</td>
+                <td class="border px-2 py-1">{{ total_amount|floatformat:2 }}</td>
+              </tr>
+              {% if bill.otherTax or bill.otherCharges %}
+                {% for tax in bill.otherTax %}
+                  <tr>
+                    <td class="border px-2 py-1"></td>
+                    <td colspan="3" class="border px-2 py-1 text-right">
+                      {{ tax.tax_NameOrType }} {{ tax.value }}%
+                    </td>
+                    <td class="border px-2 py-1">{{ tax.amount|floatformat:2 }}</td>
+                  </tr>
+                {% endfor %}
+                {% for charge in bill.otherCharges %}
+                  <tr>
+                    <td class="border px-2 py-1"></td>
+                    <td colspan="3" class="border px-2 py-1 text-right">{{ charge.Description }}</td>
+                    <td class="border px-2 py-1">{{ charge.rate|floatformat:2 }}</td>
+                  </tr>
+                {% endfor %}
+              {% endif %}
+              <tr class="font-semibold">
+                <td colspan="4" class="border px-2 py-1 text-right">Grand Total</td>
+                <td class="border px-2 py-1">{{ grand_total|floatformat:2 }}</td>
+              </tr>
+              <tr class="font-semibold">
+                <td colspan="4" class="border px-2 py-1 text-right">
+                  GST ({{ quotation.tax|default:0 }}%)
+                </td>
+                <td class="border px-2 py-1">{{ gst_amount|floatformat:2 }}</td>
+              </tr>
+              <tr class="font-semibold">
+                <td colspan="4" class="border px-2 py-1 text-right">Net Amount</td>
+                <td class="border px-2 py-1">{{ net_amount|floatformat:2 }}</td>
+              </tr>
+              <tr class="font-semibold">
+                <td colspan="4" class="border px-2 py-1 text-right">Round Off</td>
+                <td class="border px-2 py-1">{{ round_off|floatformat:2 }}</td>
+              </tr>
+              <tr class="font-semibold">
+                <td colspan="4" class="border px-2 py-1 text-right">Net Payable</td>
+                <td class="border px-2 py-1">{{ net_payable|floatformat:2 }}</td>
+              </tr>
+              <tr class="font-semibold">
+                <td colspan="5" class="border px-2 py-1 text-right">Amount In Words:{{ amount_in_words|upper }} RUPEES ONLY</td>
               </tr>
             {% endif %}
-            <tr class="font-semibold">
-              <td colspan="4" class="text-right">Discount (%)</td>
-              <td class="text-right">{{ quotation.discount|default:0 }}</td>
-            </tr>
-            <tr class="font-semibold">
-              <td colspan="4" class="text-right">Subtotal</td>
-              <td class="text-right">{{ subtotal|floatformat:2 }}</td>
-            </tr>
-            <tr class="font-semibold" style="color: #1e40af;">
-              <td colspan="4" class="text-right">GST ({{ quotation.tax|default:0 }}%)</td>
-              <td class="text-right">{{ gst_amount|floatformat:2 }}</td>
-            </tr>
-            <tr class="font-bold" style="color: #15803d;">
-              <td colspan="4" class="text-right">Grand Total</td>
-              <td class="text-right">{{ grand_total|floatformat:2 }}</td>
-            </tr>
-            <tr class="font-bold">
-              <td colspan="2" class="text-right">Amount In Words</td>
-              <td colspan="3">{{ amount_in_words|default:"N/A" }}</td>
-            </tr>
           </tbody>
         </table>
       </div>
 
       <!-- Company and Bank Details -->
-      <table style="margin-bottom: 1rem; font-size: 0.9rem; border-collapse: collapse; width: 100%;">
-  <tbody>
-    <tr>
-      <td style="border: 1px solid #000; text-align: center;"><strong>Company GST No:</strong></td>
-      <td colspan="3" style="border: 1px solid #000; text-align: center;">22AAALM0982ZJ</td>
-      <td colspan="1" style="border: 1px solid #000; text-align: left;"><strong>Bank A/c Details:</strong></td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #000; text-align: center;"><strong>Company State Code:</strong></td>
-      <td colspan="2" style="border: 1px solid #000; text-align: center;">22</td>
-      <td colspan="1" style="border: 1px solid #000; text-align: center;"><strong>A/C Name:</strong></td>
-      <td style="border: 1px solid #000; text-align: center;">MILESTONE SOFT TECH PVT LTD RAIPUR</td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #000; text-align: center;"><strong>Company's Pan No:</strong></td>
-      <td colspan="3" style="border: 1px solid #000; text-align: center;">AAGCM418P2Z2</td>
-      <td colspan="3" style="border: 1px solid #000; text-align: center;"><strong>A/C No:</strong> 86950500000005</td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #000; text-align: center;"><strong>Service Tax No:</strong></td>
-      <td colspan="3" style="border: 1px solid #000; text-align: center;"></td>
-      <td colspan="3" style="border: 1px solid #000; text-align: center;"><strong>IFSC CODE:</strong> BARB0DBPUCH</td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #000; text-align: center;"></td>
-      <td colspan="3" style="border: 1px solid #000; text-align: center;"></td>
-      <td colspan="3" style="border: 1px solid #000; text-align: center;"><strong>BANK NAME:</strong> BANK OF BARODA, PACHPEDI NAKA, RAIPUR</td>
-    </tr>
-  </tbody>
-</table>
-
+      <table style="margin-bottom: 1rem; font-size: 0.9rem; border-collapse: collapse;">
+        <tbody>
+          <tr>
+            <td class="border px-2 py-1 align-top" style="text-align: left;">
+              <strong>Company GST No:</strong>
+            </td>
+            <td class="border px-2 py-1 align-top" colspan="3" style="text-align: left;">
+              22AAALM0982ZJ
+            </td>
+            <td class="border px-2 py-1 align-top" colspan="1" style="text-align: left;">
+              <strong>Bank A/c Details:</strong>
+            </td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-1 align-top" style="text-align: left;">
+              <strong>Company State Code:</strong>
+            </td>
+            <td class="border px-2 py-1 align-top text-center" colspan="2">
+              22
+            </td>
+            <td class="border px-2 py-1 align-top" colspan="1" style="text-align: left;">
+              <strong>A/C Name:</strong>
+            </td>
+            <td class="border px-2 py-1 align-top" style="text-align: left;">
+              MILESTONE SOFT TECH PVT LTD RAIPUR
+            </td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-1 align-top" style="text-align: left;">
+              <strong>Company's Pan No:</strong>
+            </td>
+            <td class="border px-2 py-1 align-top text-center" colspan="3">
+              AAGCM418P2Z2
+            </td>
+            <td class="border px-2 py-1 align-top" colspan="3" style="text-align: left;">
+              <strong>A/C No:</strong> 86950500000005
+            </td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-1 align-top" style="text-align: left;">
+              <strong>Service Tax No:</strong>
+            </td>
+            <td class="border px-2 py-1 align-top" colspan="3"></td>
+            <td class="border px-2 py-1 align-top" colspan="3" style="text-align: left;">
+              <strong>IFSC CODE:</strong> BARB0DBPUCH
+            </td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-1 align-top" style="text-align: left;"></td>
+            <td class="border px-2 py-1 align-top" colspan="3"></td>
+            <td class="border px-2 py-1 align-top" colspan="3" style="text-align: left;">
+              <strong>BANK NAME:</strong> BANK OF BARODA, PACHPEDI NAKA, RAIPUR
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <!-- Declaration -->
-      <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; font-size: 0.85rem;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;" class="mb-2">
         <thead>
           <tr>
-            <th class="border p-2 text-left">Declaration:</th>
+            <th class="border px-2 py-1 text-left">Declaration:</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td class="border p-3">
+            <td class="border px-3 py-2">
               <ol class="ml-5 list-decimal">
                 <li>We Declare that this invoice shows the actual price of the goods/services described.</li>
                 <li>Cheque and demand drafts to be favour of Milestone Soft Tech Pvt Ltd. Raipur</li>
