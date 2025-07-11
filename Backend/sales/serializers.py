@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_mongoengine.serializers import DocumentSerializer, EmbeddedDocumentSerializer
-from .models import Customer, QuotationForSale
+from .models import Customer, QuotationForSale, BillForSale
 from inventory.serializers import ProductSerializer
 from inventory.models import Product
 from datetime import datetime, timezone
@@ -239,3 +239,14 @@ class QuotationForSaleSerializer(DocumentSerializer):
     class Meta:
         model = QuotationForSale
         fields = '__all__'
+
+
+class BillForSaleSerializer(DocumentSerializer):
+    workOrderNo=serializers.CharField(allow_blank=True)
+    comments=serializers.CharField(allow_blank=True)
+    otherCharges=serializers.ListField(allow_empty=True)
+    otherTax=serializers.ListField(allow_empty=True)
+   
+    class Meta:
+        model= BillForSale
+        fields ="__all__"

@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from rest_framework_mongoengine.serializers import DocumentSerializer, EmbeddedDocumentSerializer
 from .models import BillingAddress, TaxInfo, BankInfo, Supplier
+from inventory.serializers import ProductSerializer
+from inventory.models import Product
+from datetime import datetime, timezone
 from bson import ObjectId
 
 class BillingAddressSerializer(EmbeddedDocumentSerializer):
@@ -172,3 +175,6 @@ class SupplierSerializer(DocumentSerializer):
         representation.pop('taxInfo', None)
         representation.pop('bankinfo', None)
         return representation
+    
+
+

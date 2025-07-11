@@ -1,9 +1,9 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Customer, QuotationForSale
+from .models import Customer, QuotationForSale,BillForSale
 from .serializers import QuotationForSaleSerializer
-from .serializers import CustomerSerializer
+from .serializers import CustomerSerializer,BillForSaleSerializer
 from inventory.models import Product
 from inventory.serializers import ProductSerializer
 
@@ -125,20 +125,51 @@ def bill(request, pk):
     except QuotationForSale.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
-        serializer = QuotationForSaleSerializer(quotation)
-        data = serializer.data
+    try:
+        bill = BillForSale.objects.get(quotation=quotation.id)
+    except QuotationForSale.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-        
-        data = serializer.data
-        input_text = data['quotationNumber']
-        output_text = convert_qut_to_inv(input_text)
-        data['quotationNumber']= output_text
+    if request.method == 'GET':
+        serializer = BillForSaleSerializer(bill)
+       
         # print(data['quotationNumber'])
        
 
 
-        return Response(data)
+        return Response(serializer.data)
+
+    
+@api_view(['POST'])
+def genrate_bill(request, pk):
+    try:
+        quotation = QuotationForSale.objects.get(pk=pk)
+    except QuotationForSale.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'POST':
+        data = request.data
+        data['invoiceNo']=convert_qut_to_inv(data['invoiceNo'])
+       
+        serializer=BillForSaleSerializer(data=data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            if not quotation.billGenrated:
+                quotation.billGenrated = True
+                quotation_serializer = QuotationForSaleSerializer(quotation, data={'billGenrated': True}, partial=True)
+                if quotation_serializer.is_valid():
+                    quotation_serializer.save()
+                else:
+                    print("Quotation update errors:", quotation_serializer.errors)
+                    return Response(
+                        {"error": "Bill created, but failed to update quotation", "details": quotation_serializer.errors},
+                        status=status.HTTP_207_MULTI_STATUS
+                    )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        print("error",serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     
 

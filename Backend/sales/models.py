@@ -1,4 +1,4 @@
-from mongoengine import Document, StringField, EmailField, ReferenceField, ListField, EmbeddedDocument, EmbeddedDocumentField, FloatField, DateTimeField,DictField
+from mongoengine import BooleanField, Document, StringField, EmailField, ReferenceField, ListField, EmbeddedDocument, EmbeddedDocumentField, FloatField, DateTimeField,DictField
 from core.models import BaseDocument
 from datetime import datetime, timezone
 from inventory.models import Product
@@ -70,5 +70,18 @@ class QuotationForSale(Document):
     tax = FloatField(default=0.0)
     totalAmount = FloatField(required=True)
     createdAt = DateTimeField(default=datetime.now(timezone.utc))
+    billGenrated=BooleanField(default=False)
 
     meta = {'collection': 'QuotationsForSale',}
+
+
+
+class BillForSale(Document):
+    invoiceNo = StringField()
+    quotation=ReferenceField(QuotationForSale)
+    otherTax=ListField()
+    otherCharges=ListField()
+    workOrderNo=StringField()
+    comments=StringField()
+
+    meta = {'collection': 'BillForSales',}

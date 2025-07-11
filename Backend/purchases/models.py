@@ -44,7 +44,6 @@ class Supplier(BaseDocument):
     taxInfo=EmbeddedDocumentField(TaxInfo)
     bankinfo=EmbeddedDocumentField(BankInfo)
 
-
     meta = {'collection': 'Supplier'}
 
 

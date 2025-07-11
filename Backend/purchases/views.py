@@ -43,3 +43,6 @@ def supplier_detail(request, pk):
     elif request.method == 'DELETE':
         supplier.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+
