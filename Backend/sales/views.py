@@ -440,3 +440,170 @@ def preview_quotation_template(request, quotation_id):
         "date": now().strftime("%d/%m/%Y"),
         "amount_in_words": amount_in_words,
     })
+
+import requests
+import json
+import io 
+WHATSAPP_TOKEN = 'EAAygQ7LfCqcBPBeUMuD9r825e71bm4MWT7Legx2bg1xI5FnV10yDTiIhQ9ylbYlvjDDfkSQ0Tkwbf0zjalGf65BmmmKqZA8uPCt0Pq7M8V9ZAaVOx94UFyK05BmIJNMGiVHqNhV3qxkBgMKhar7y0LzzLpF6KNqiNgexZAaHdTpWRGqvPHWqNFWpU3INOZCgRqBRCXuJmLQ63YrDWmON1ESVMZAZApKZBFT8ThtLQVZB7JSFgQEZD'
+PHONE_NUMBER_ID = '688419727694158'
+def upload_pdf_memory(file_obj):
+    print("pdf uplod started")
+    url = f'https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/media'
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_TOKEN}',
+    }
+    files = {
+        'file': (file_obj.name, file_obj, 'application/pdf'),
+        'type': (None, 'document'),
+        'messaging_product': (None, 'whatsapp'),
+    }
+
+    response = requests.post(url, headers=headers, files=files)
+    return response.json()
+
+
+def send_pdf_via_whatsapp(media_id,contact):
+    print("pdf sending started")
+    RECIPIENT_PHONE_NUMBER=contact
+    url = f'https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages'
+
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_TOKEN}',
+        'Content-Type': 'application/json',
+    }
+
+    data = {
+        "messaging_product": "whatsapp",
+        "to": RECIPIENT_PHONE_NUMBER,
+        "type": "document",
+        "document": {
+            "id": media_id,
+            "caption": "Here is your PDF"
+        }
+    }
+    text_message="hellow"
+
+    text_data = {
+            "messaging_product": "whatsapp",
+            "to": RECIPIENT_PHONE_NUMBER,
+            "type": "text",
+            "text": {
+                "body": text_message
+            }
+        }
+    text_response = requests.post(url, headers=headers, json=text_data)
+    print("text msg sent",text_response)
+    response = requests.post(url, headers=headers, json=data)
+    return response.json()
+
+@api_view(["POST"])
+def send_pdf(request,quotation_id):
+    print("starting sending pdf in whatsapp")
+    try:
+        quotation = QuotationForSale.objects.get(pk=quotation_id)
+    except QuotationForSale.DoesNotExist:
+        return Response({"error": "Quotation not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        customer = Customer.objects.get(pk=quotation.customer.id)
+    except Customer.DoesNotExist:
+        return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        bill = BillForSale.objects.get(quotation=quotation_id)
+    except BillForSale.DoesNotExist:
+        return Response({"error": "Bill not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Prepare data
+    contact = customer.contact if customer and customer.contact else "N/A"
+    address = customer.address if customer and customer.address else "N/A"
+
+    # Calculate item totals
+    items = quotation.items or []
+    for item in items:
+        quantity = float(item.get("quantity", 0)) if item.get("quantity") else 0
+        unit_price = float(item.get("unit_price", 0)) if item.get("unit_price") else 0
+        item["total"] = quantity * unit_price
+
+    # Calculate service totals
+    services = quotation.services or []
+    for service in services:
+        service["rate"] = float(service.get("rate", 0)) if service.get("rate") else 0
+
+    # Calculate total amount
+    item_subtotal = sum(item["total"] for item in items)
+    service_subtotal = sum(service["rate"] for service in services)
+    total_amount = item_subtotal + service_subtotal
+
+    # Calculate other taxes
+    other_tax = bill.otherTax or []
+    for tax in other_tax:
+        tax_value = float(tax.get("value", 0)) if tax.get("value") else 0
+        tax["amount"] = total_amount * tax_value / 100
+
+    # Calculate other charges
+    other_charges = bill.otherCharges or []
+    for charge in other_charges:
+        charge["rate"] = float(charge.get("rate", 0)) if charge.get("rate") else 0
+
+    # Calculate grand total
+    other_tax_total = sum(tax["amount"] for tax in other_tax)
+    other_charge_total = sum(charge["rate"] for charge in other_charges)
+    grand_total = total_amount + other_tax_total + other_charge_total
+    after_discount = grand_total - (grand_total * (0 / 100))
+    gst_amount = after_discount * (float(quotation.tax or 0) / 100)
+    net_amount = after_discount + gst_amount
+    round_off = net_amount - int(net_amount)
+    net_payable = int(net_amount)
+    amount_in_words = num2words(net_payable, lang="en_IN").title()
+
+    # Embed logo image as base64
+    logo_path = finders.find('images/company_logo.png')
+    if not logo_path:
+        return Response({"error": "Logo image not found"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    with open(logo_path, 'rb') as image_file:
+        logo_base64 = base64.b64encode(image_file.read()).decode('utf-8')
+
+    # Convert quotation number to invoice number
+    # bill_number = convert_qut_to_inv(quotation.quotationNumber) if quotation.quotationNumber else "N/A"
+
+    # Render HTML template
+    html_string = render_to_string("quotation_bill_template.html", {
+        "quotation": quotation,
+        "bill": bill,
+        "items": items,
+        "services": services,
+        "total_amount": total_amount,
+        "grand_total": after_discount,
+        "gst_amount": gst_amount,
+        "net_amount": net_amount,
+        "round_off": round_off,
+        "net_payable": net_payable,
+        "amount_in_words": amount_in_words,
+        "date": datetime.now().strftime("%d/%m/%Y"),
+        "logo_base64": logo_base64,
+        "contact": contact,
+        "address": address,
+    })
+
+    # Generate PDF
+    html = HTML(string=html_string)
+    pdf_file = html.write_pdf()
+
+    pdf_io = io.BytesIO(pdf_file)
+    pdf_io.name = 'document.pdf'
+    RECIPIENT_PHONE_NUMBER = "+91"+contact
+
+    upload_response = upload_pdf_memory(pdf_io)
+    print(upload_response)
+    media_id = upload_response.get('id')
+
+    if not media_id:
+        return JsonResponse({'error': upload_response}, status=400)
+
+    # 2. Send PDF
+    message_response = send_pdf_via_whatsapp(media_id,RECIPIENT_PHONE_NUMBER)
+    print(message_response)
+    return JsonResponse(message_response)
+
+

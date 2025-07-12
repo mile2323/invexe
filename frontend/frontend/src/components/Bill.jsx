@@ -37,6 +37,23 @@ const Bill = () => {
     }
   };
 
+  const handlePdf = async () => {
+    try {
+      if (!quotation.id) {
+        setLoading(false);
+        alert("No quotation ID available to send email.");
+        return;
+      }
+      setLoading(true);
+      const response = await axios.post(`${APIURL}/sales/send-bill-pdf/${quotation.id}/`);
+      setLoading(false);
+      alert("Pdf sent successfully!");
+    } catch (error) {
+      setLoading(false);
+      alert("Failed to send email.");
+    }
+  };
+
   const handlePrint = () => {
     if (componentRef.current) {
       setLoading(true);
@@ -241,7 +258,7 @@ const Bill = () => {
           </style>
 
           <div className="flex justify-between mb-3">
-            <h2 className="text-3xl font-bold mb-4">Bill</h2>
+            <h2 className="text-3xl font-bold mb-4 no-print">Bill</h2>
             <div className="flex space-x-2">
               <Button
                 onClick={handlePrint}
@@ -259,6 +276,14 @@ const Bill = () => {
                 className="no-print"
               >
                 Send Email
+              </Button>
+               <Button
+                onClick={handlePdf}
+                variant="secondary"
+                disabled={!quotation.quotationNumber}
+                className="no-print"
+              >
+                Send Whatsapp
               </Button>
             </div>
           </div>
