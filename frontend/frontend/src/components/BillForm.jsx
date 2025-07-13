@@ -79,6 +79,7 @@ const BillForm = ({ objId }) => {
       ...prev,
       invoiceNo:quotationData ? quotationData.quotationNumber : '',
       quotation:quotationData ? quotationData.id :'',
+      discount:billData.discount,
       totalAmount: calculateTotalAmount(),
     }));
   }, [billData.otherTax, billData.otherCharges, billData.discount, prevTotal]);

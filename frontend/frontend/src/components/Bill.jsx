@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -144,8 +143,7 @@ const Bill = () => {
 
       const grandT = otherTaxtotal + otherCharge;
       console.log("grandTotal:", grandT);
-      const afterDiscount = grandT - (grandT * (parseFloat(billdata.discount) || 0)) / 100;
-      setGrandTotal(isNaN(afterDiscount) ? 0 : afterDiscount);
+      setGrandTotal(isNaN(grandT) ? 0 : grandT);
     };
 
     calculateGrandTotal();
@@ -154,7 +152,9 @@ const Bill = () => {
   useEffect(() => {
     const calculateNetamount = () => {
       if (!billGenrated) return;
-      const netAmt = grandTotal + (grandTotal * (quotation.tax || 0) / 100);
+      const afterDiscount = grandTotal - (grandTotal * (parseFloat(billdata.discount) || 0)) / 100;
+
+      const netAmt = afterDiscount + ((afterDiscount * (quotation.tax || 0) / 100) );
       setNetamount(netAmt);
     };
 
@@ -220,6 +220,17 @@ const Bill = () => {
     .no-print {
       display: none !important;
     }
+    .card {
+  border: 1px solid #000;
+  border-radius: 6px;
+  margin: 0 auto;
+  width: 190mm;
+  padding: 5mm;
+  box-sizing: border-box;
+  overflow: hidden;
+  break-inside: avoid;
+  page-break-after: always; /* Ensure each card ends on its own page */
+}
 
     table {
       width: 100%;
@@ -287,22 +298,21 @@ const Bill = () => {
               </Button>
             </div>
           </div>
-
-          <div ref={componentRef} className="printable-area">
-            <Card>
-              <CardContent className="space-y-2 text-sm">
-                <table
+          
+          <div ref={componentRef} className="printable-area card">
+                <div className="card-content text-sm">
+                  <table
                   className="w-full text-left border text-sm"
                   style={{ marginBottom: "6mm", borderCollapse: "collapse" }}
                 >
                   <tbody>
                     <tr>
-                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}>
-                        <div className="flex items-center space-x-3">
-                          <img src="/company_logo.png" alt="Company Logo" className="h-10 w-auto" />
-                          <h1 className="text-xl font-bold border-b-2 border-black pb-0.5">Milestone</h1>
-                        </div>
-                      </td>
+                      <td className="border px-3 py-1 align-top text-center">
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+                            <img src="/company_logo.png" alt="Company Logo" style={{ height: '60px', width: 'auto' }} />
+                            <h1 className="font-bold border-b-4 border-black" style={{ fontSize: "40px", lineHeight: "1" }}>Milestone</h1>
+                          </div>
+                        </td>
                       <td style={{ width: "50%", verticalAlign: "top", textAlign: "left" }}>
                         <p>69/2, Vikas Nagar, Devpuri, Raipur CG, 492015</p>
                         <p>India, Ph: 0771-4020500, 7587777550/51/52</p>
@@ -311,399 +321,271 @@ const Bill = () => {
                     </tr>
                   </tbody>
                 </table>
-                <h2
-                  style={{
-                    fontSize: "24px",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    marginBottom: "6mm",
-                    borderBottom: "2px solid #000000",
-                    display: "block",
-                    letterSpacing: "0.5px",
-                  }}
-                >
-                  TAX-INVOICE
-                </h2>
 
-                <table style={{ fontSize: "8.5pt", borderCollapse: "collapse", width: "100%" }}>
-                  <tbody>
-                    <tr>
-                      <td style={{ border: "1px solid #000000", textAlign: "left" }}>
-                        <strong>Invoice No:</strong> {billdata.invoceNo  || "N/A"}
-                      </td>
-                      <td colSpan="3" style={{ border: "1px solid #000000", textAlign: "right" }}>
-                        <strong>Date:</strong> {today}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ border: "1px solid #000000", textAlign: "left" }}>
-                        <strong>Party Name:</strong> {quotation.customerName || "N/A"}
-                      </td>
-                      <td colSpan="3" style={{ border: "1px solid #000000", textAlign: "left" }}>
-                        <strong>Address:</strong> {quotation.address || "N/A"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ border: "1px solid #000000", textAlign: "left" }}>
-                        <strong>GST No:</strong>
-                      </td>
-                      <td style={{ border: "1px solid #000000", textAlign: "right" }}>22AAALM0982ZJ</td>
-                      <td style={{ border: "1px solid #000000", textAlign: "right" }}>
-                        <strong>State code:</strong>
-                      </td>
-                      <td style={{ border: "1px solid #000000", textAlign: "right" }}>22</td>
-                    </tr>
-                    <tr>
-                      <td style={{ border: "1px solid #000000", textAlign: "left" }}>
-                        <strong>Kind Attention:</strong>
-                      </td>
-                      <td colSpan="3" style={{ border: "1px solid #000000", textAlign: "right" }}></td>
-                    </tr>
-                    <tr>
-                      <td style={{ border: "1px solid #000000", textAlign: "left" }}>
-                        <strong>Work Order No.</strong>
-                      </td>
-                      <td style={{ border: "1px solid #000000", textAlign: "left" }}>
-                        <strong>Date</strong>{today}
-                      </td>
-                      <td style={{ border: "1px solid #000000", textAlign: "left" }}>
-                        <strong>Payment Terms</strong>
-                      </td>
-                      <td style={{ border: "1px solid #000000", textAlign: "left" }}>
-                        <strong>Other Comments</strong>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2" style={{ border: "1px solid #000000", textAlign: "left" }}>
-                        No.{billdata.workOrderNo || "N/A"}
-                      </td>
-                      <td style={{ border: "1px solid #000000", textAlign: "left" }}>As per Order/Full</td>
-                      <td style={{ border: "1px solid #000000", textAlign: "left" }}>{billdata.comments || "N/A"}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                  <h2>TAX-INVOICE</h2>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border text-sm">
-                    <thead className="table-header">
-                      <tr>
-                        <th className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>#</th>
-                        <th className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>Description</th>
-                        <th className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>Qty</th>
-                        <th className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>Rate</th>
-                        <th className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>Amount</th>
-                      </tr>
-                    </thead>
+                  <table style={{ fontSize: '0.9rem', borderCollapse: 'collapse', width: '100%' }}>
                     <tbody>
-                      {(!quotation.items || quotation.items.length === 0) &&
-                      (!quotation.services || quotation.services.length === 0) ? (
-                        <tr>
-                          <td
-                            colSpan="5"
-                            className="py-2 px-1.5 text-center"
-                            style={{ fontSize: "8.5pt" }}
-                          >
-                            No quotation items or services found
-                          </td>
-                        </tr>
-                      ) : (
-                        <>
-                          {quotation.items &&
-                            quotation.items.map((item, index) => (
-                              <tr key={`item-${index}`}>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                                  {index + 1}
-                                </td>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                                  {item.product_name}
-                                </td>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                                  {item.quantity}
-                                </td>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                                  {item.unit_price}
-                                </td>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                                  {(item.quantity * item.unit_price).toFixed(2)}
-                                </td>
-                              </tr>
-                            ))}
-                          {quotation.services &&
-                            quotation.services.map((serviceItem, index) => (
-                              <tr key={`service-${index}`}>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                                  {(quotation.items ? quotation.items.length : 0) + index + 1}
-                                </td>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                                  <strong>{serviceItem.name}</strong> ({serviceItem.description})
-                                </td>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>1</td>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                                  {serviceItem.rate}
-                                </td>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                                  {parseFloat(serviceItem.rate).toFixed(2)}
-                                </td>
-                              </tr>
-                            ))}
-                        </>
-                      )}
-                      <tr className="font-semibold">
-                        <td
-                          colSpan="4"
-                          className="border px-1.5 py-0.5 text-right"
-                          style={{ fontSize: "8.5pt" }}
-                        >
-                          Total
+                      <tr>
+                        <td style={{ border: '1px solid #000000', textAlign: 'left' }}>
+                          <strong>Invoice No:</strong> {billdata.invoceNo || "N/A"}
                         </td>
-                        <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                          {totalAmount.toFixed(2)}
+                        <td colSpan="3" style={{ border: '1px solid #000000', textAlign: 'right' }}>
+                          <strong>Date:</strong> {today}
                         </td>
                       </tr>
-                      {(!billdata.otherTax || billdata.otherTax.length === 0) &&
-                      (!billdata.otherCharges || billdata.otherCharges.length === 0) ? (
-                        <tr></tr>
-                      ) : (
-                        <>
-                          {billdata.otherTax &&
-                            billdata.otherTax.map((tax, index) => (
-                              <tr key={`tax-${index}`}>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}></td>
-                                <td
-                                  colSpan="3"
-                                  className="border px-1.5 py-0.5 text-right"
-                                  style={{ fontSize: "8.5pt" }}
-                                >
-                                  {tax.tax_NameOrType} {tax.value}%
-                                </td>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                                  {(totalAmount * (tax.value || 0) / 100).toFixed(2)}
-                                </td>
-                              </tr>
-                            ))}
-                          {billdata.otherCharges &&
-                            billdata.otherCharges.map((other, index) => (
-                              <tr key={`charge-${index}`}>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}></td>
-                                <td
-                                  colSpan="3"
-                                  className="border px-1.5 py-0.5 text-right"
-                                  style={{ fontSize: "8.5pt" }}
-                                >
-                                  {other.Description}
-                                </td>
-                                <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                                  {other.rate}
-                                </td>
-                              </tr>
-                            ))}
-                        </>
-                      )}
-                      <tr className="font-semibold">
-                        <td
-                          colSpan="4"
-                          className="border px-1.5 py-0.5 text-right"
-                          style={{ fontSize: "8.5pt" }}
-                        >
-                          Grand Total
+                      <tr>
+                        <td style={{ border: '1px solid #000000', textAlign: 'left' }}>
+                          <strong>Party Name:</strong> {quotation.customerName || "N/A"}
                         </td>
-                        <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                          {grandTotal.toFixed(2)}
+                        <td colSpan="3" style={{ border: '1px solid #000000', textAlign: 'left' }}>
+                          <strong>Address:</strong> {quotation.address || "N/A"}
                         </td>
                       </tr>
-                      <tr className="font-semibold">
-                        <td
-                          colSpan="4"
-                          className="border px-1.5 py-0.5 text-right"
-                          style={{ fontSize: "8.5pt" }}
-                        >
-                          GST ({quotation.tax || 0}%)
+                      <tr>
+                        <td style={{ border: '1px solid #000000', textAlign: 'left' }}>
+                          <strong>GST No:</strong>
                         </td>
-                        <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                          {(totalAmount * (quotation.tax || 0) / 100).toFixed(2)}
+                        <td style={{ border: '1px solid #000000', textAlign: 'right' }}>22AAALM0982ZJ</td>
+                        <td style={{ border: '1px solid #000000', textAlign: 'right' }}>
+                          <strong>State code:</strong>
+                        </td>
+                        <td style={{ border: '1px solid #000000', textAlign: 'right' }}>22</td>
+                      </tr>
+                      <tr>
+                        <td style={{ border: '1px solid #000000', textAlign: 'left' }}>
+                          <strong>Kind Attention:</strong>
+                        </td>
+                        <td colSpan="3" style={{ border: '1px solid #000000', textAlign: 'right' }}></td>
+                      </tr>
+                      <tr>
+                        <td style={{ border: '1px solid #000000', textAlign: 'left' }}>
+                          <strong>Work Order No.</strong>
+                        </td>
+                        <td style={{ border: '1px solid #000000', textAlign: 'left' }}>
+                          <strong>Date</strong> {today}
+                        </td>
+                        <td style={{ border: '1px solid #000000', textAlign: 'left' }}>
+                          <strong>Payment Terms</strong>
+                        </td>
+                        <td style={{ border: '1px solid #000000', textAlign: 'left' }}>
+                          <strong>Other Comments</strong>
                         </td>
                       </tr>
-                      <tr className="font-semibold">
-                        <td
-                          colSpan="4"
-                          className="border px-1.5 py-0.5 text-right"
-                          style={{ fontSize: "8.5pt" }}
-                        >
-                          Net Amount
+                      <tr>
+                        <td colSpan="2" style={{ border: '1px solid #000000', textAlign: 'left' }}>
+                          No.{billdata.workOrderNo || "N/A"}
                         </td>
-                        <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                          {netAmount.toFixed(2)}
-                        </td>
-                      </tr>
-                      <tr className="font-semibold">
-                        <td
-                          colSpan="4"
-                          className="border px-1.5 py-0.5 text-right"
-                          style={{ fontSize: "8.5pt" }}
-                        >
-                          Round Off
-                        </td>
-                        <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                          {(netAmount - Math.floor(netAmount)).toFixed(2)}
-                        </td>
-                      </tr>
-                      <tr className="font-semibold">
-                        <td
-                          colSpan="4"
-                          className="border px-1.5 py-0.5 text-right"
-                          style={{ fontSize: "8.5pt" }}
-                        >
-                          Net Payable
-                        </td>
-                        <td className="border px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                          {Math.floor(netAmount).toFixed(2)}
-                        </td>
-                      </tr>
-                      <tr className="font-semibold">
-                        <td
-                          colSpan="5"
-                          className="border px-1.5 py-0.5 text-right"
-                          style={{ fontSize: "8.5pt" }}
-                        >
-                          Amount In Words:{toWords(Math.floor(netAmount)).toUpperCase()} RUPEES ONLY
-                        </td>
-                        
+                        <td style={{ border: '1px solid #000000', textAlign: 'left' }}>As per Order/Full</td>
+                        <td style={{ border: '1px solid #000000', textAlign: 'left' }}>{billdata.comments || "N/A"}</td>
                       </tr>
                     </tbody>
                   </table>
+
+                  <div className="mt-4" style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr>
+                          <th className="border px-2 py-1">No.</th>
+                          <th className="border px-2 py-1">Description</th>
+                          <th className="border px-2 py-1">Qty</th>
+                          <th className="border px-2 py-1">Rate</th>
+                          <th className="border px-2 py-1">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(!quotation.items || quotation.items.length === 0) &&
+                        (!quotation.services || quotation.services.length === 0) ? (
+                          <tr>
+                            <td colSpan="5" className="py-2 px-2 text-center">
+                              No quotation items or services found
+                            </td>
+                          </tr>
+                        ) : (
+                          <>
+                            {quotation.items &&
+                              quotation.items.map((item, index) => (
+                                <tr key={`item-${index}`}>
+                                  <td className="border px-2 py-1">{index + 1}</td>
+                                  <td className="border px-2 py-1">{item.product_name}</td>
+                                  <td className="border px-2 py-1">{item.quantity}</td>
+                                  <td className="border px-2 py-1">{item.unit_price}</td>
+                                  <td className="border px-2 py-1">{(item.quantity * item.unit_price).toFixed(2)}</td>
+                                </tr>
+                              ))}
+                            {quotation.services &&
+                              quotation.services.map((serviceItem, index) => (
+                                <tr key={`service-${index}`}>
+                                  <td className="border px-2 py-1">
+                                    {(quotation.items ? quotation.items.length : 0) + index + 1}
+                                  </td>
+                                  <td className="border px-2 py-1">
+                                    <strong>{serviceItem.name}</strong> ({serviceItem.description})
+                                  </td>
+                                  <td className="border px-2 py-1">1</td>
+                                  <td className="border px-2 py-1">{serviceItem.rate}</td>
+                                  <td className="border px-2 py-1">{parseFloat(serviceItem.rate).toFixed(2)}</td>
+                                </tr>
+                              ))}
+                            <tr className="font-semibold">
+                              <td colSpan="4" className="border px-2 py-1 text-right">Total</td>
+                              <td className="border px-2 py-1">{totalAmount.toFixed(2)}</td>
+                            </tr>
+                            {billdata.otherTax &&
+                              billdata.otherTax.map((tax, index) => (
+                                <tr key={`tax-${index}`}>
+                                  <td className="border px-2 py-1"></td>
+                                  <td colSpan="3" className="border px-2 py-1 text-right">
+                                    {tax.tax_NameOrType} {tax.value}%
+                                  </td>
+                                  <td className="border px-2 py-1">{(totalAmount * (tax.value || 0) / 100).toFixed(2)}</td>
+                                </tr>
+                              ))}
+                            {billdata.otherCharges &&
+                              billdata.otherCharges.map((other, index) => (
+                                <tr key={`charge-${index}`}>
+                                  <td className="border px-2 py-1"></td>
+                                  <td colSpan="3" className="border px-2 py-1 text-left">{other.Description}</td>
+                                  <td className="border px-2 py-1">{other.rate}</td>
+                                </tr>
+                              ))}
+                            <tr className="font-semibold">
+                              <td colSpan="4" className="border px-2 py-1 text-right">Grand Total</td>
+                              <td className="border px-2 py-1">{grandTotal.toFixed(2)}</td>
+                            </tr>
+                            {parseFloat(billdata.discount) > 0 && (
+                              <>
+                                <tr className="font-semibold">
+                                  <td colSpan="4" className="border px-2 py-1 text-right">
+                                    Discount% {parseFloat(billdata.discount).toFixed(2)}
+                                  </td>
+                                  <td className="border px-2 py-1">
+                                    {(grandTotal * parseFloat(billdata.discount) / 100).toFixed(2)}
+                                  </td>
+                                </tr>
+                                <tr className="font-semibold">
+                                  <td colSpan="4" className="border px-2 py-1 text-right">
+                                    Grand Total After Discount
+                                  </td>
+                                  <td className="border px-2 py-1">
+                                    {(grandTotal - (grandTotal * parseFloat(billdata.discount) / 100)).toFixed(2)}
+                                  </td>
+                                </tr>
+                              </>
+                            )}
+                            <tr className="font-semibold">
+                              <td colSpan="4" className="border px-2 py-1 text-right">
+                                GST ({quotation.tax || 0}%)
+                              </td>
+                              <td className="border px-2 py-1">
+                                {((grandTotal - (grandTotal * parseFloat(billdata.discount) / 100)) * (quotation.tax || 0) / 100).toFixed(2)}
+                              </td>
+                            </tr>
+                            <tr className="font-semibold">
+                              <td colSpan="4" className="border px-2 py-1 text-right">Net Amount</td>
+                              <td className="border px-2 py-1">{netAmount.toFixed(2)}</td>
+                            </tr>
+                            <tr className="font-semibold">
+                              <td colSpan="4" className="border px-2 py-1 text-right">Round Off</td>
+                              <td className="border px-2 py-1">{(netAmount - Math.floor(netAmount)).toFixed(2)}</td>
+                            </tr>
+                            <tr className="font-semibold">
+                              <td colSpan="4" className="border px-2 py-1 text-right">Net Payable</td>
+                              <td className="border px-2 py-1">{Math.floor(netAmount).toFixed(2)}</td>
+                            </tr>
+                            <tr className="font-semibold">
+                              <td colSpan="5" className="border px-2 py-1 text-right">
+                                Amount In Words: {toWords(Math.floor(netAmount)).toUpperCase()} RUPEES ONLY
+                              </td>
+                            </tr>
+                          </>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <table style={{ fontSize: '0.9rem', borderCollapse: 'collapse' }}>
+                    <tbody>
+                      <tr>
+                        <td className="border px-2 py-1 align-top" style={{ textAlign: 'left' }}>
+                          <strong>Company GST No:</strong>
+                        </td>
+                        <td className="border px-2 py-1 align-top" colSpan="3" style={{ textAlign: 'left' }}>
+                          22AAALM0982ZJ
+                        </td>
+                        <td className="border px-2 py-1 align-top" colSpan="1" style={{ textAlign: 'left' }}>
+                          <strong>Bank A/c Details:</strong>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="border px-2 py-1 align-top" style={{ textAlign: 'left' }}>
+                          <strong>Company State Code:</strong>
+                        </td>
+                        <td className="border px-2 py-1 align-top text-center" colSpan="2">
+                          22
+                        </td>
+                        <td className="border px-2 py-1 align-top" colSpan="1" style={{ textAlign: 'left' }}>
+                          <strong>A/C Name:</strong>
+                        </td>
+                        <td className="border px-2 py-1 align-top" style={{ textAlign: 'left' }}>
+                          MILESTONE SOFT TECH PVT LTD RAIPUR
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="border px-2 py-1 align-top" style={{ textAlign: 'left' }}>
+                          <strong>Company's Pan No:</strong>
+                        </td>
+                        <td className="border px-2 py-1 align-top text-center" colSpan="3">
+                          AAGCM418P2Z2
+                        </td>
+                        <td className="border px-2 py-1 align-top" colSpan="3" style={{ textAlign: 'left' }}>
+                          <strong>A/C No:</strong> 86950500000005
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="border px-2 py-1 align-top" style={{ textAlign: 'left' }}>
+                          <strong>Service Tax No:</strong>
+                        </td>
+                        <td className="border px-2 py-1 align-top" colSpan="3"></td>
+                        <td className="border px-2 py-1 align-top" colSpan="3" style={{ textAlign: 'left' }}>
+                          <strong>IFSC CODE:</strong> BARB0DBPUCH
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="border px-2 py-1 align-top" style={{ textAlign: 'left' }}></td>
+                        <td className="border px-2 py-1 align-top" colSpan="3"></td>
+                        <td className="border px-2 py-1 align-top" colSpan="3" style={{ textAlign: 'left' }}>
+                          <strong>BANK NAME:</strong> BANK OF BARODA, PACHPEDI NAKA, RAIPUR
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }} className="mb-2">
+                    <thead>
+                      <tr>
+                        <th className="border px-2 py-1 text-left">Declaration:</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="border px-3 py-2">
+                          <ol className="list-decimal" style={{ marginLeft: '18px' }}>
+                            <li>We Declare that this invoice shows the actual price of the goods/services described.</li>
+                            <li>Cheque and demand drafts to be favour of Milestone Soft Tech Pvt Ltd. Raipur</li>
+                            <li>All disputes are subject to Raipur jurisdiction.</li>
+                          </ol>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <div className="text-right font-semibold mt-6">
+                    <p>Authorized Signatory</p>
+                  </div>
                 </div>
-
-                <table
-                  className="w-full text-left border text-sm declaration-table"
-                  style={{ marginTop: "6mm", marginBottom: "6mm", borderCollapse: "collapse" }}
-                >
-                  <tbody>
-                    <tr>
-                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}>
-                        <strong>Company GST No:</strong>
-                      </td>
-                      <td
-                        className="border px-1.5 py-0.5 align-top"
-                        colSpan={3}
-                        style={{ textAlign: "left" }}
-                      >
-                        22AAALM0982ZJ
-                      </td>
-                      <td
-                        className="border px-1.5 py-0.5 align-top"
-                        colSpan={1}
-                        style={{ textAlign: "left" }}
-                      >
-                        <strong>Bank A/c Details:</strong>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}>
-                        <strong>Company State Code:</strong>
-                      </td>
-                      <td
-                        className="border px-1.5 py-0.5 align-top text-center"
-                        colSpan={2}
-                        style={{ verticalAlign: "middle" }}
-                      >
-                        22
-                      </td>
-                      <td
-                        className="border px-1.5 py-0.5 align-top"
-                        colSpan={1}
-                        style={{ textAlign: "left" }}
-                      >
-                        <strong>A/C Name:</strong>
-                      </td>
-                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}>
-                        MILESTONE SOFT TECH PVT LTD RAIPUR
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}>
-                        <strong>Company's Pan No:</strong>
-                      </td>
-                      <td
-                        className="border px-1.5 py-0.5 align-top text-center"
-                        colSpan={3}
-                        style={{ verticalAlign: "middle" }}
-                      >
-                        AAGCM418P2Z2
-                      </td>
-                      <td
-                        className="border px-1.5 py-0.5 align-top"
-                        colSpan={3}
-                        style={{ textAlign: "left" }}
-                      >
-                        <strong>A/C No:</strong> 86950500000005
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}>
-                        <strong>Service Tax No:</strong>
-                      </td>
-                      <td
-                        className="border px-1.5 py-0.5 align-top"
-                        colSpan={3}
-                        style={{ textAlign: "left" }}
-                      ></td>
-                      <td
-                        className="border px-1.5 py-0.5 align-top"
-                        colSpan={3}
-                        style={{ textAlign: "left" }}
-                      >
-                        <strong>IFSC CODE:</strong> BARB0DBPUCH
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}></td>
-                      <td
-                        className="border px-1.5 py-0.5 align-top"
-                        colSpan={3}
-                        style={{ textAlign: "right" }}
-                      ></td>
-                      <td
-                        className="border px-1.5 py-0.5 align-top"
-                        colSpan={3}
-                        style={{ textAlign: "left" }}
-                      >
-                        <strong>BANK NAME:</strong> BANK OF BARODA, PACHPEDI NAKA, RAIPUR
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-
-                <table
-                  className="w-full border border-black border-collapse text-sm declaration-table"
-                  style={{ marginTop: "6mm", marginBottom: "6mm" }}
-                >
-                  <thead>
-                    <tr>
-                      <th className="border border-black px-1.5 py-0.5 text-left" style={{ fontSize: "8.5pt" }}>
-                        Declaration:
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="border border-black px-1.5 py-0.5" style={{ fontSize: "8.5pt" }}>
-                        <ol className="ml-4 list-decimal">
-                          <li>We Declare that this invoice shows the actual price of the goods/services described.</li>
-                          <li>Cheque and demand drafts to be favour of Milestone Soft Tech Pvt Ltd. Raipur</li>
-                          <li>All disputes are subject to Raipur jurisdiction.</li>
-                        </ol>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-
-                <div className="text-right font-semibold mt-3">
-                  <p>Authorized Signatory</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              </div>
+            </div>
       ) : (
         <BillForm objId={objectId} />
       )}

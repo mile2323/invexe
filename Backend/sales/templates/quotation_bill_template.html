@@ -283,6 +283,25 @@
                 <td colspan="4" class="border px-2 py-1 text-right">Grand Total</td>
                 <td class="border px-2 py-1">{{ grand_total|floatformat:2 }}</td>
               </tr>
+              {% if discountPercent > 0 %}
+  <tr class="font-semibold">
+    <td colspan="4" class="border px-1.5 py-0.5 text-right" style="font-size: 8.5pt;">
+      Discount% {{ bill.discount|floatformat:2 }}
+    </td>
+    <td class="border px-1.5 py-0.5" style="font-size: 8.5pt;">
+      {{discount|floatformat:2 }}
+    </td>
+  </tr>
+  <tr class="font-semibold">
+    <td colspan="4" class="border px-1.5 py-0.5 text-right" style="font-size: 8.5pt;">
+      Grand Total After Dicsount
+    </td>
+    <td class="border px-1.5 py-0.5" style="font-size: 8.5pt;">
+      {{discountAmount|floatformat:2}}
+    </td>
+  </tr>
+{% endif %}
+
               <tr class="font-semibold">
                 <td colspan="4" class="border px-2 py-1 text-right">
                   GST ({{ quotation.tax|default:0 }}%)

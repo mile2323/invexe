@@ -83,5 +83,6 @@ class BillForSale(Document):
     otherCharges=ListField()
     workOrderNo=StringField()
     comments=StringField()
+    discount=StringField()
 
     meta = {'collection': 'BillForSales',}

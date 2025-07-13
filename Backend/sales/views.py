@@ -359,9 +359,8 @@ def send_bill_email(request, quotation_id):
     other_tax_total = sum(tax["amount"] for tax in other_tax)
     other_charge_total = sum(charge["rate"] for charge in other_charges)
     grand_total = total_amount + other_tax_total + other_charge_total
-    after_discount = grand_total - (grand_total * (0 / 100))
-    gst_amount = after_discount * (float(quotation.tax or 0) / 100)
-    net_amount = after_discount + gst_amount
+    gst_amount = grand_total * (float(quotation.tax or 0) / 100)
+    net_amount = grand_total + gst_amount
     round_off = net_amount - int(net_amount)
     net_payable = int(net_amount)
     amount_in_words = num2words(net_payable, lang="en_IN").title()
@@ -375,15 +374,28 @@ def send_bill_email(request, quotation_id):
 
     # Convert quotation number to invoice number
     bill_number = convert_qut_to_inv(quotation.quotationNumber) if quotation.quotationNumber else "N/A"
+    discountAmount=0
+    discount=0
+    discountPercent=0
+    if float(bill.discount)>0:
+        discountPercent=float(bill.discount)
+        discountAmount= grand_total -(grand_total * float(bill.discount)/100)
+        gst_amount=discountAmount * (float(quotation.tax or 0) / 100)
+        net_amount = discountAmount + gst_amount
+        discount=grand_total-discountAmount
+        round_off = net_amount - int(net_amount)
+        net_payable = int(net_amount)
+
 
     # Render HTML template
+    print(discountPercent)
     html_string = render_to_string("quotation_bill_template.html", {
         "quotation": quotation,
         "bill": bill,
         "items": items,
         "services": services,
         "total_amount": total_amount,
-        "grand_total": after_discount,
+        "grand_total": grand_total,
         "gst_amount": gst_amount,
         "net_amount": net_amount,
         "round_off": round_off,
@@ -393,6 +405,9 @@ def send_bill_email(request, quotation_id):
         "logo_base64": logo_base64,
         "contact": contact,
         "address": address,
+        "discountAmount":discountAmount,
+        "discount":discount,
+        "discountPercent":discountPercent
     })
 
     # Generate PDF

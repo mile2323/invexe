@@ -246,6 +246,7 @@ class BillForSaleSerializer(DocumentSerializer):
     comments=serializers.CharField(allow_blank=True)
     otherCharges=serializers.ListField(allow_empty=True)
     otherTax=serializers.ListField(allow_empty=True)
+    discount=serializers.CharField(allow_blank=True)
    
     class Meta:
         model= BillForSale
