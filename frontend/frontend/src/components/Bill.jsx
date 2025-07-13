@@ -504,63 +504,108 @@ const Bill = () => {
                     </table>
                   </div>
 
-                  <table style={{ fontSize: '0.9rem', borderCollapse: 'collapse' }}>
-                    <tbody>
-                      <tr>
-                        <td className="border px-2 py-1 align-top" style={{ textAlign: 'left' }}>
-                          <strong>Company GST No:</strong>
-                        </td>
-                        <td className="border px-2 py-1 align-top" colSpan="3" style={{ textAlign: 'left' }}>
-                          22AAALM0982ZJ
-                        </td>
-                        <td className="border px-2 py-1 align-top" colSpan="1" style={{ textAlign: 'left' }}>
-                          <strong>Bank A/c Details:</strong>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="border px-2 py-1 align-top" style={{ textAlign: 'left' }}>
-                          <strong>Company State Code:</strong>
-                        </td>
-                        <td className="border px-2 py-1 align-top text-center" colSpan="2">
-                          22
-                        </td>
-                        <td className="border px-2 py-1 align-top" colSpan="1" style={{ textAlign: 'left' }}>
-                          <strong>A/C Name:</strong>
-                        </td>
-                        <td className="border px-2 py-1 align-top" style={{ textAlign: 'left' }}>
-                          MILESTONE SOFT TECH PVT LTD RAIPUR
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="border px-2 py-1 align-top" style={{ textAlign: 'left' }}>
-                          <strong>Company's Pan No:</strong>
-                        </td>
-                        <td className="border px-2 py-1 align-top text-center" colSpan="3">
-                          AAGCM418P2Z2
-                        </td>
-                        <td className="border px-2 py-1 align-top" colSpan="3" style={{ textAlign: 'left' }}>
-                          <strong>A/C No:</strong> 86950500000005
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="border px-2 py-1 align-top" style={{ textAlign: 'left' }}>
-                          <strong>Service Tax No:</strong>
-                        </td>
-                        <td className="border px-2 py-1 align-top" colSpan="3"></td>
-                        <td className="border px-2 py-1 align-top" colSpan="3" style={{ textAlign: 'left' }}>
-                          <strong>IFSC CODE:</strong> BARB0DBPUCH
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="border px-2 py-1 align-top" style={{ textAlign: 'left' }}></td>
-                        <td className="border px-2 py-1 align-top" colSpan="3"></td>
-                        <td className="border px-2 py-1 align-top" colSpan="3" style={{ textAlign: 'left' }}>
-                          <strong>BANK NAME:</strong> BANK OF BARODA, PACHPEDI NAKA, RAIPUR
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <table
+                  className="w-full text-left border text-sm declaration-table"
+                  style={{ marginTop: "6mm", marginBottom: "6mm", borderCollapse: "collapse" }}
+                >
+                  <tbody>
+                    <tr>
+                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}>
+                        <strong>Company GST No:</strong>
+                      </td>
+                      <td
+                        className="border px-1.5 py-0.5 align-top"
+                        colSpan={3}
+                        style={{ textAlign: "left" }}
+                      >
+                        22AAALM0982ZJ
+                      </td>
+                      <td
+                        className="border px-1.5 py-0.5 align-top"
+                        colSpan={1}
+                        style={{ textAlign: "left" }}
+                      >
+                        <strong>Bank A/c Details:</strong>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}>
+                        <strong>Company State Code:</strong>
+                      </td>
+                      <td
+                        className="border px-1.5 py-0.5 align-top text-center"
+                        colSpan={2}
+                        style={{ verticalAlign: "middle" }}
+                      >
+                        22
+                      </td>
+                      <td
+                        className="border px-1.5 py-0.5 align-top"
+                        colSpan={1}
+                        style={{ textAlign: "left" }}
+                      >
+                        <strong>A/C Name:</strong>
+                      </td>
+                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}>
+                        MILESTONE SOFT TECH PVT LTD RAIPUR
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}>
+                        <strong>Company's Pan No:</strong>
+                      </td>
+                      <td
+                        className="border px-1.5 py-0.5 align-top text-center"
+                        colSpan={3}
+                        style={{ verticalAlign: "middle" }}
+                      >
+                        AAGCM418P2Z2
+                      </td>
+                      <td
+                        className="border px-1.5 py-0.5 align-top"
+                        colSpan={3}
+                        style={{ textAlign: "left" }}
+                      >
+                        <strong>A/C No:</strong> 86950500000005
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}>
+                        <strong>Service Tax No:</strong>
+                      </td>
+                      <td
+                        className="border px-1.5 py-0.5 align-top"
+                        colSpan={3}
+                        style={{ textAlign: "left" }}
+                      ></td>
+                      <td
+                        className="border px-1.5 py-0.5 align-top"
+                        colSpan={3}
+                        style={{ textAlign: "left" }}
+                      >
+                        <strong>IFSC CODE:</strong> BARB0DBPUCH
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border px-1.5 py-0.5 align-top" style={{ textAlign: "left" }}></td>
+                      <td
+                        className="border px-1.5 py-0.5 align-top"
+                        colSpan={3}
+                        style={{ textAlign: "right" }}
+                      ></td>
+                      <td
+                        className="border px-1.5 py-0.5 align-top"
+                        colSpan={3}
+                        style={{ textAlign: "left" }}
+                      >
+                        <strong>BANK NAME:</strong> BANK OF BARODA, PACHPEDI NAKA, RAIPUR
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
 
+                
+                  
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }} className="mb-2">
                     <thead>
                       <tr>

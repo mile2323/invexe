@@ -459,8 +459,8 @@ def preview_quotation_template(request, quotation_id):
 import requests
 import json
 import io 
-WHATSAPP_TOKEN = 'EAAygQ7LfCqcBPBeUMuD9r825e71bm4MWT7Legx2bg1xI5FnV10yDTiIhQ9ylbYlvjDDfkSQ0Tkwbf0zjalGf65BmmmKqZA8uPCt0Pq7M8V9ZAaVOx94UFyK05BmIJNMGiVHqNhV3qxkBgMKhar7y0LzzLpF6KNqiNgexZAaHdTpWRGqvPHWqNFWpU3INOZCgRqBRCXuJmLQ63YrDWmON1ESVMZAZApKZBFT8ThtLQVZB7JSFgQEZD'
-PHONE_NUMBER_ID = '688419727694158'
+WHATSAPP_TOKEN = 'EAAQVt7XObe8BPMr7reLZB6AIwcIagYFMZCUeJTicP9NuNgwTwmVBTxIwUvGJONqDXxUcB3PXalSp2ZCwy0AMgqRZBRoP6VGsCoVdkz8ayfBs47ZAzlrFkwMSWMfao9NOzae4yq3oA0L0ZBQb2ZBSANFx3QumbZCTmukUaCbvF02EPxvgOZBg25tAfXyqkrSNqT32FkZAyeGXALHDfCWzDsIyPtW0GSE5hhZBSlnPL64Q98QH3nQT80ZD'
+PHONE_NUMBER_ID = '639682735904942'
 def upload_pdf_memory(file_obj):
     print("pdf uplod started")
     url = f'https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/media'
@@ -480,7 +480,7 @@ def upload_pdf_memory(file_obj):
 def send_pdf_via_whatsapp(media_id,contact):
     print("pdf sending started")
     RECIPIENT_PHONE_NUMBER=contact
-    url = f'https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages'
+    url = f'https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages'
 
     headers = {
         'Authorization': f'Bearer {WHATSAPP_TOKEN}',
