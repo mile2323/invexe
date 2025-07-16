@@ -1,0 +1,44 @@
+{
+  "name": "inventory-management",
+  "version": "1.0.0",
+  "description": "Inventory Management App",
+  "author": "Milestone ICDS",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "concurrently \"cd ../frontend && npm run dev\" \"cd ../Backend && python manage.py runserver 127.0.0.1:8000 --noreload\" \"cross-env DEV=true electron .\"",
+    "build": "cd ../frontend && npm run build && cd ../Backend && pip install -r requirements.txt && cd ../electron && electron-builder"
+  },
+  "build": {
+    "productName": "InventoryManagement",
+    "files": [
+      "main.js",
+      "preload.js",
+      "../frontend/dist/**/*",
+      "../Backend/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "../frontend/public/icon.png"
+    },
+    "asarUnpack": [
+      "../Backend/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../Backend",
+        "to": "Backend",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
+  },
+  "devDependencies": {
+    "concurrently": "^7.3.0",
+    "cross-env": "^7.0.3",
+    "electron": "^37.2.1",
+    "electron-builder": "^24.13.3",
+    "electron-is-dev": "^2.0.0"
+  }
+}

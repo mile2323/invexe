@@ -1,2 +1,5 @@
 venv
 .venv
+venv32
+.git
+.vscode
